@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+  <persistence-unit name="SISCAFE" transaction-type="RESOURCE_LOCAL">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <class>siscafe.model.CitySource</class>
+    <class>siscafe.model.SlotStore</class>
+    <class>siscafe.model.ItemsServices</class>
+    <class>siscafe.model.MarkCaffee</class>
+    <class>siscafe.model.TypeUnits</class>
+    <class>siscafe.model.StoresCaffee</class>
+    <class>siscafe.model.RelatedServices</class>
+    <class>siscafe.model.WeighingPackagingCaffee</class>
+    <class>siscafe.model.Customs</class>
+    <class>siscafe.model.RemittancesCaffeeHasNoveltysCaffee</class>
+    <class>siscafe.model.Shippers</class>
+    <class>siscafe.model.ServicesOrders</class>
+    <class>siscafe.model.CategoryPermits</class>
+    <class>siscafe.model.PortOperators</class>
+    <class>siscafe.model.Clients</class>
+    <class>siscafe.model.UnitsCaffee</class>
+    <class>siscafe.model.TypeContainer</class>
+    <class>siscafe.model.PackagingCaffee</class>
+    <class>siscafe.model.MotorShips</class>
+    <class>siscafe.model.Departaments</class>
+    <class>siscafe.model.PackingCaffee</class>
+    <class>siscafe.model.ReturnsCaffees</class>
+    <class>siscafe.model.Sessions</class>
+    <class>siscafe.model.FumigationServices</class>
+    <class>siscafe.model.Lines</class>
+    <class>siscafe.model.WeighingDownloadCaffee</class>
+    <class>siscafe.model.RemittancesCaffee</class>
+    <class>siscafe.model.NoveltysCaffee</class>
+    <class>siscafe.model.Permits</class>
+    <class>siscafe.model.Users</class>
+    <class>siscafe.model.Profiles</class>
+    <class>siscafe.model.ShippingLines</class>
+    <class>siscafe.models.RemittancesCaffee</class>
+    <properties>
+      <property name="javax.persistence.jdbc.url" value="jdbc:mysql://192.168.35.213:3306/schema_siscafe?zeroDateTimeBehavior=convertToNull"/>
+      <property name="javax.persistence.jdbc.user" value="sop_user"/>
+      <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
+      <property name="javax.persistence.jdbc.password" value="123"/>
+    </properties>
+  </persistence-unit>
+</persistence>
