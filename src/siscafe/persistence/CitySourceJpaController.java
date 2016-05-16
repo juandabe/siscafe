@@ -6,17 +6,14 @@
 package siscafe.persistence;
 
 import java.io.Serializable;
+import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import siscafe.model.RemittancesCaffee;
-import java.util.ArrayList;
-import java.util.List;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import siscafe.model.CitySource;
-import siscafe.persistence.exceptions.IllegalOrphanException;
 import siscafe.persistence.exceptions.NonexistentEntityException;
 import siscafe.persistence.exceptions.PreexistingEntityException;
 
@@ -36,29 +33,11 @@ public class CitySourceJpaController implements Serializable {
     }
 
     public void create(CitySource citySource) throws PreexistingEntityException, Exception {
-        if (citySource.getRemittancesCaffeeList() == null) {
-            citySource.setRemittancesCaffeeList(new ArrayList<RemittancesCaffee>());
-        }
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            List<RemittancesCaffee> attachedRemittancesCaffeeList = new ArrayList<RemittancesCaffee>();
-            for (RemittancesCaffee remittancesCaffeeListRemittancesCaffeeToAttach : citySource.getRemittancesCaffeeList()) {
-                remittancesCaffeeListRemittancesCaffeeToAttach = em.getReference(remittancesCaffeeListRemittancesCaffeeToAttach.getClass(), remittancesCaffeeListRemittancesCaffeeToAttach.getId());
-                attachedRemittancesCaffeeList.add(remittancesCaffeeListRemittancesCaffeeToAttach);
-            }
-            citySource.setRemittancesCaffeeList(attachedRemittancesCaffeeList);
             em.persist(citySource);
-            for (RemittancesCaffee remittancesCaffeeListRemittancesCaffee : citySource.getRemittancesCaffeeList()) {
-                CitySource oldCitySourceIdOfRemittancesCaffeeListRemittancesCaffee = remittancesCaffeeListRemittancesCaffee.getCitySourceId();
-                remittancesCaffeeListRemittancesCaffee.setCitySourceId(citySource);
-                remittancesCaffeeListRemittancesCaffee = em.merge(remittancesCaffeeListRemittancesCaffee);
-                if (oldCitySourceIdOfRemittancesCaffeeListRemittancesCaffee != null) {
-                    oldCitySourceIdOfRemittancesCaffeeListRemittancesCaffee.getRemittancesCaffeeList().remove(remittancesCaffeeListRemittancesCaffee);
-                    oldCitySourceIdOfRemittancesCaffeeListRemittancesCaffee = em.merge(oldCitySourceIdOfRemittancesCaffeeListRemittancesCaffee);
-                }
-            }
             em.getTransaction().commit();
         } catch (Exception ex) {
             if (findCitySource(citySource.getId()) != null) {
@@ -72,45 +51,12 @@ public class CitySourceJpaController implements Serializable {
         }
     }
 
-    public void edit(CitySource citySource) throws IllegalOrphanException, NonexistentEntityException, Exception {
+    public void edit(CitySource citySource) throws NonexistentEntityException, Exception {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            CitySource persistentCitySource = em.find(CitySource.class, citySource.getId());
-            List<RemittancesCaffee> remittancesCaffeeListOld = persistentCitySource.getRemittancesCaffeeList();
-            List<RemittancesCaffee> remittancesCaffeeListNew = citySource.getRemittancesCaffeeList();
-            List<String> illegalOrphanMessages = null;
-            for (RemittancesCaffee remittancesCaffeeListOldRemittancesCaffee : remittancesCaffeeListOld) {
-                if (!remittancesCaffeeListNew.contains(remittancesCaffeeListOldRemittancesCaffee)) {
-                    if (illegalOrphanMessages == null) {
-                        illegalOrphanMessages = new ArrayList<String>();
-                    }
-                    illegalOrphanMessages.add("You must retain RemittancesCaffee " + remittancesCaffeeListOldRemittancesCaffee + " since its citySourceId field is not nullable.");
-                }
-            }
-            if (illegalOrphanMessages != null) {
-                throw new IllegalOrphanException(illegalOrphanMessages);
-            }
-            List<RemittancesCaffee> attachedRemittancesCaffeeListNew = new ArrayList<RemittancesCaffee>();
-            for (RemittancesCaffee remittancesCaffeeListNewRemittancesCaffeeToAttach : remittancesCaffeeListNew) {
-                remittancesCaffeeListNewRemittancesCaffeeToAttach = em.getReference(remittancesCaffeeListNewRemittancesCaffeeToAttach.getClass(), remittancesCaffeeListNewRemittancesCaffeeToAttach.getId());
-                attachedRemittancesCaffeeListNew.add(remittancesCaffeeListNewRemittancesCaffeeToAttach);
-            }
-            remittancesCaffeeListNew = attachedRemittancesCaffeeListNew;
-            citySource.setRemittancesCaffeeList(remittancesCaffeeListNew);
             citySource = em.merge(citySource);
-            for (RemittancesCaffee remittancesCaffeeListNewRemittancesCaffee : remittancesCaffeeListNew) {
-                if (!remittancesCaffeeListOld.contains(remittancesCaffeeListNewRemittancesCaffee)) {
-                    CitySource oldCitySourceIdOfRemittancesCaffeeListNewRemittancesCaffee = remittancesCaffeeListNewRemittancesCaffee.getCitySourceId();
-                    remittancesCaffeeListNewRemittancesCaffee.setCitySourceId(citySource);
-                    remittancesCaffeeListNewRemittancesCaffee = em.merge(remittancesCaffeeListNewRemittancesCaffee);
-                    if (oldCitySourceIdOfRemittancesCaffeeListNewRemittancesCaffee != null && !oldCitySourceIdOfRemittancesCaffeeListNewRemittancesCaffee.equals(citySource)) {
-                        oldCitySourceIdOfRemittancesCaffeeListNewRemittancesCaffee.getRemittancesCaffeeList().remove(remittancesCaffeeListNewRemittancesCaffee);
-                        oldCitySourceIdOfRemittancesCaffeeListNewRemittancesCaffee = em.merge(oldCitySourceIdOfRemittancesCaffeeListNewRemittancesCaffee);
-                    }
-                }
-            }
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
@@ -128,7 +74,7 @@ public class CitySourceJpaController implements Serializable {
         }
     }
 
-    public void destroy(Integer id) throws IllegalOrphanException, NonexistentEntityException {
+    public void destroy(Integer id) throws NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -139,17 +85,6 @@ public class CitySourceJpaController implements Serializable {
                 citySource.getId();
             } catch (EntityNotFoundException enfe) {
                 throw new NonexistentEntityException("The citySource with id " + id + " no longer exists.", enfe);
-            }
-            List<String> illegalOrphanMessages = null;
-            List<RemittancesCaffee> remittancesCaffeeListOrphanCheck = citySource.getRemittancesCaffeeList();
-            for (RemittancesCaffee remittancesCaffeeListOrphanCheckRemittancesCaffee : remittancesCaffeeListOrphanCheck) {
-                if (illegalOrphanMessages == null) {
-                    illegalOrphanMessages = new ArrayList<String>();
-                }
-                illegalOrphanMessages.add("This CitySource (" + citySource + ") cannot be destroyed since the RemittancesCaffee " + remittancesCaffeeListOrphanCheckRemittancesCaffee + " in its remittancesCaffeeList field has a non-nullable citySourceId field.");
-            }
-            if (illegalOrphanMessages != null) {
-                throw new IllegalOrphanException(illegalOrphanMessages);
             }
             em.remove(citySource);
             em.getTransaction().commit();

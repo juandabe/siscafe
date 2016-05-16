@@ -147,7 +147,7 @@ public class MarkCaffee implements Serializable {
 
     @Override
     public String toString() {
-        return "siscafe.model.MarkCaffee[ id=" + id + " ]";
+        return name;
     }
     
 }

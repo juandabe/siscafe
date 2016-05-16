@@ -7,6 +7,7 @@ import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import javax.persistence.Persistence;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -54,7 +55,9 @@ import siscafe.model.TypeContainer;
 import siscafe.model.TypeUnits;
 import siscafe.model.UnitsCaffee;
 import siscafe.model.Users;
+import siscafe.model.WeighingDownloadCaffee;
 import siscafe.persistence.CategoryPermitsJpaController;
+import siscafe.util.ClockPartFrontendView;
 
 
 /**
@@ -75,6 +78,9 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
         this.usersView = new UsersView();
         this.usersModel = new Users();
         this.categoryPermitsJpaController = new CategoryPermitsJpaController(Persistence.createEntityManagerFactory( "SISCAFE" ));
+        Map<String, Object> emfProperties = categoryPermitsJpaController.getEntityManager().getProperties();
+        jLabel5.setText((String) emfProperties.get("javax.persistence.jdbc.url"));
+        new Thread(new ClockPartFrontendView(jLabel3)).start();
         Dimension desktopSize = jDesktopPane1.getSize();
         Dimension jInternalFrameSize = loginView.getSize();
         loginView.setLocation((desktopSize.width - jInternalFrameSize.width)/2,
@@ -99,6 +105,8 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
         DefaultMutableTreeNode ndcat = new DefaultMutableTreeNode("Salir");
         this.root.add(ndcat);
         model.reload();
+        this.userLoged = userLoged;
+        jLabel6.setText(userLoged.getUsername());
     }
     
     private void configPermitByCategory(CategoryPermits categoryPermits, List<Permits> listPermits, DefaultMutableTreeNode root) {
@@ -132,12 +140,10 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
         jDesktopPane1 = new javax.swing.JDesktopPane();
         jSplitPane2 = new javax.swing.JSplitPane();
         jToolBar1 = new javax.swing.JToolBar();
+        jLabel3 = new javax.swing.JLabel();
+        jSeparator1 = new javax.swing.JToolBar.Separator();
         jLabel1 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
-        jSeparator1 = new javax.swing.JToolBar.Separator();
-        jLabel3 = new javax.swing.JLabel();
-        jSeparator4 = new javax.swing.JToolBar.Separator();
-        jLabel8 = new javax.swing.JLabel();
         jToolBar2 = new javax.swing.JToolBar();
         jLabel2 = new javax.swing.JLabel();
         jSeparator2 = new javax.swing.JToolBar.Separator();
@@ -184,23 +190,17 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
 
         jSplitPane1.setRightComponent(jDesktopPane1);
 
-        jSplitPane2.setDividerLocation(2000);
+        jSplitPane2.setDividerLocation(1000);
 
         jToolBar1.setFloatable(false);
 
-        jLabel1.setText("usuario: ");
-        jToolBar1.add(jLabel1);
-
-        jLabel6.setText("jecheverri");
-        jToolBar1.add(jLabel6);
-        jToolBar1.add(jSeparator1);
-
         jLabel3.setText("2016/01/26");
         jToolBar1.add(jLabel3);
-        jToolBar1.add(jSeparator4);
+        jToolBar1.add(jSeparator1);
 
-        jLabel8.setText("18:56:45");
-        jToolBar1.add(jLabel8);
+        jLabel1.setText("usuario: ");
+        jToolBar1.add(jLabel1);
+        jToolBar1.add(jLabel6);
 
         jSplitPane2.setRightComponent(jToolBar1);
 
@@ -228,8 +228,10 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane2, javax.swing.GroupLayout.Alignment.TRAILING)
             .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1165, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jSplitPane2)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -257,12 +259,15 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
         String node = evt.getNewLeadSelectionPath().getLastPathComponent().toString();
         switch (node) {
             case "Pesaje de Café":
+                weighingDownloadCaffee = new WeighingDownloadCaffee();
                 weighingView = new WeighingView();
                 jDesktopPane1.removeAll();
                 jDesktopPane1.add(weighingView);
                 weighingView.setVisible(true);
-                weighingController = new WeighingController(weighingView);
+                weighingController = new WeighingController(weighingView,weighingDownloadCaffee, this.userLoged);
                 weighingController.activeBascule();
+                weighingController.initListener();
+                jLabel2.setText("Pesaje de Café");
                 break;
             case "Perfiles":
                 profile = new Profiles();
@@ -272,6 +277,7 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
                 profilesView.setVisible(true);
                 profilesController = new ProfilesController(profile,profilesView);
                 profilesController.initListener();
+                jLabel2.setText("Perfiles");
                 break;
             case "Permisos":
                 permitsModel = new Permits();
@@ -281,6 +287,7 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
                 permitsView.setVisible(true);
                 permitsController = new PermitsController(permitsModel, permitsView);
                 permitsController.initListener();
+                jLabel2.setText("Permisos");
                 break;
             case "Sedes":
                 departamentsModel = new Departaments();
@@ -290,6 +297,7 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
                 departamentsView.setVisible(true);
                 departamentsController = new DepartamentsController(departamentsModel, departamentsView);
                 departamentsController.initListener();
+                jLabel2.setText("Sedes");
                 break;
             case "Usuarios":
                 usersModel = new Users();
@@ -299,6 +307,7 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
                 this.userController.initListener();
                 jDesktopPane1.add(usersView);
                 usersView.setVisible(true);
+                jLabel2.setText("Usuarios");
                 break;
             case "Clientes":
                 clientsModel = new Clients();
@@ -308,6 +317,7 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
                 this.clientsController.initListener();
                 jDesktopPane1.add(clientsView);
                 clientsView.setVisible(true);
+                jLabel2.setText("Clientes");
                 break;
             case "Bodegas":
                 storesCaffeeModel = new StoresCaffee();
@@ -317,6 +327,7 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
                 this.storesCaffeeController.initListener();
                 jDesktopPane1.add(storesCaffeeView);
                 storesCaffeeView.setVisible(true);
+                jLabel2.setText("Bodegas");
                 break;
             case "Slots":
                 slotStoreModel = new SlotStore();
@@ -326,6 +337,7 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
                 this.slotStoreController.initListener();
                 jDesktopPane1.add(slotStoreView);
                 slotStoreView.setVisible(true);
+                jLabel2.setText("Slots");
                 break;
             case "Tipo unidades":
                 typeUnitsModel = new TypeUnits();
@@ -335,6 +347,7 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
                 this.typeUnitsController.initListener();
                 jDesktopPane1.add(typeUnitsView);
                 typeUnitsView.setVisible(true);
+                jLabel2.setText("Tipo unidades");
                 break;
             case "Unidades":
                 unitsCaffeeModel = new UnitsCaffee();
@@ -344,6 +357,7 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
                 this.unitsCaffeeController.initListener();
                 jDesktopPane1.add(unitsCaffeeView);
                 unitsCaffeeView.setVisible(true);
+                jLabel2.setText("Unidades");
                 break;
             case "Marcas":
                 markCaffeeModel = new MarkCaffee();
@@ -353,6 +367,7 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
                 this.markCaffeeController.initListener();
                 jDesktopPane1.add(markCaffeeView);
                 markCaffeeView.setVisible(true);
+                jLabel2.setText("Unidades");
                 break;
             case "Operadores Portuarios":
                 portOperatorsModel = new PortOperators();
@@ -362,6 +377,7 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
                 this.portOperatorsController.initListener();
                 jDesktopPane1.add(portOperatorsView);
                 portOperatorsView.setVisible(true);
+                jLabel2.setText("Operadores Portuarios");
                 break;
             case "Lineas navieras":
                 shippingLinesModel = new ShippingLines();
@@ -371,6 +387,7 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
                 this.shippingLinesController.initListener();
                 jDesktopPane1.add(shippingLinesView);
                 shippingLinesView.setVisible(true);
+                jLabel2.setText("Lineas navieras");
                 break;
             case "Empresas de transportes":
                 shippersModel = new Shippers();
@@ -380,6 +397,7 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
                 this.shippersController.initListener();
                 jDesktopPane1.add(shippersView);
                 shippersView.setVisible(true);
+                jLabel2.setText("Empresas de transportes");
                 break;
             case "Aduanas":
                 customsModel = new Customs();
@@ -389,6 +407,7 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
                 this.customsController.initListener();
                 jDesktopPane1.add(customsView);
                 customsView.setVisible(true);
+                jLabel2.setText("Aduanas");
                 break;
             case "Tipo contenedores":
                 typeContainerModel = new TypeContainer();
@@ -398,6 +417,7 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
                 this.typeContainerController.initListener();
                 jDesktopPane1.add(typeContainerView);
                 typeContainerView.setVisible(true);
+                jLabel2.setText("Tipo contenedores");
                 break;
             case "Ciudad origen":
                 citySourceModel = new CitySource();
@@ -407,6 +427,7 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
                 this.typeContainerController.initListener();
                 jDesktopPane1.add(citySourceView);
                 citySourceView.setVisible(true);
+                jLabel2.setText("Ciudad origen");
                 break;
             case "Items de servicios":
                 itemsServicesModel = new ItemsServices();
@@ -416,6 +437,7 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
                 this.itemsServicesController.initListener();
                 jDesktopPane1.add(itemsServicesView);
                 itemsServicesView.setVisible(true);
+                jLabel2.setText("Items de servicios");
                 break;
             case "Novedades":
                 noveltysCaffeeModel = new NoveltysCaffee();
@@ -425,6 +447,7 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
                 this.noveltysCaffeeController.initListener();
                 jDesktopPane1.add(noveltysCaffeeView);
                 noveltysCaffeeView.setVisible(true);
+                jLabel2.setText("Novedades");
                 break;
             case "Tipo Empaques":
                 packingCaffeeModel = new PackingCaffee();
@@ -434,6 +457,7 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
                 packingCaffeeController.initListener();
                 jDesktopPane1.add(packingCaffeeView);
                 packingCaffeeView.setVisible(true);
+                jLabel2.setText("Tipo Empaques");
                 break;
             case "Radicar Café":
                 remittancesCaffeeModel = new RemittancesCaffee();
@@ -443,6 +467,17 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
                 remittancesCaffeeController.initListener();
                 jDesktopPane1.add(remittancesCaffeeView);
                 remittancesCaffeeView.setVisible(true);
+                jLabel2.setText("Radicar Café");
+                break;
+            case "Ciudades origenes":
+                citySourceModel = new CitySource();
+                citySourceView = new CitySourceView();
+                jDesktopPane1.removeAll();
+                citySourceController = new CitySourceController(citySourceModel, citySourceView);
+                citySourceController.initListener();
+                jDesktopPane1.add(citySourceView);
+                citySourceView.setVisible(true);
+                jLabel2.setText("Ciudades origenes");
                 break;
             case "Salir":
                 int response = JOptionPane.showConfirmDialog(this, "¿Desea salir del sistema?", "Confirmación", JOptionPane.OK_CANCEL_OPTION);
@@ -509,6 +544,7 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
         });
     }
     
+    private WeighingDownloadCaffee weighingDownloadCaffee;
     private PackingCaffeeView packingCaffeeView;
     private PackingCaffeeController packingCaffeeController;
     private PackingCaffee packingCaffeeModel;
@@ -585,12 +621,10 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JToolBar.Separator jSeparator2;
     private javax.swing.JToolBar.Separator jSeparator3;
-    private javax.swing.JToolBar.Separator jSeparator4;
     private javax.swing.JToolBar.Separator jSeparator6;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JSplitPane jSplitPane2;

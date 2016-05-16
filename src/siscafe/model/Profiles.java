@@ -156,7 +156,7 @@ public class Profiles implements Serializable {
 
     @Override
     public String toString() {
-        return "siscafe.model.Profiles[ id=" + id + " ]";
+        return name;
     }
     
 }

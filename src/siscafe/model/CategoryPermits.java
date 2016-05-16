@@ -133,7 +133,7 @@ public class CategoryPermits implements Serializable {
 
     @Override
     public String toString() {
-        return "siscafe.model.CategoryPermits[ id=" + id + " ]";
+        return name;
     }
     
 }

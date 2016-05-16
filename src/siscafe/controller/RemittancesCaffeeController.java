@@ -151,9 +151,15 @@ public class RemittancesCaffeeController  implements ActionListener, ListSelecti
         remittancesCaffee.setPackingCafeeId(findPackingCaffeeByNameLocal(packingCaffee));
         String driverUsers = (String) this.remittancesCaffeeView.jComboBox6.getSelectedItem();
         remittancesCaffee.setStaffDriverId(findUsersByNameLocal(driverUsers));
-        String samplerUsers = (String) this.remittancesCaffeeView.jComboBox6.getSelectedItem();
+        String samplerUsers = (String) this.remittancesCaffeeView.jComboBox5.getSelectedItem();
         remittancesCaffee.setStaffSampleId(findUsersByNameLocal(samplerUsers));
         remittancesCaffee.setIsActive(true);
+        remittancesCaffee.setTotalTare(0.0);
+        remittancesCaffee.setQuantityBagOutStore(0);
+        remittancesCaffee.setTotalWeightNetNominal(0.0);
+        remittancesCaffee.setTotalWeightNetReal(0.0);
+        remittancesCaffee.setQuantityInPalletCaffee(0);
+        remittancesCaffee.setQuantityOutPalletCaffee(0);
         try {
             remittancesCaffeeJpaController.create(remittancesCaffee);
         } catch (Exception ex) {

@@ -286,6 +286,28 @@ public class RemittancesCaffeeJpaController implements Serializable {
             return null;
         }
     }
+    
+    public List<RemittancesCaffee> findRemittancesCaffeePendientWeight() {
+        EntityManager em = getEntityManager();
+        Query query = em.createQuery("SELECT r FROM RemittancesCaffee r  WHERE r.downloadCaffeeDate IS NULL and r.isActive=true");
+        try {
+            return (List<RemittancesCaffee>) query.getResultList();
+        }
+        catch(Exception e) {
+            return null;
+        }
+    }
+    
+    public List<RemittancesCaffee> findRemittancesCaffeeInProcessWieght() {
+        EntityManager em = getEntityManager();
+        Query query = em.createQuery("SELECT r FROM RemittancesCaffee r  WHERE r.downloadCaffeeDate IS NOT NULL and r.packagingCaffeeDate IS NULL and r.isActive=true");
+        try {
+            return (List<RemittancesCaffee>) query.getResultList();
+        }
+        catch(Exception e) {
+            return null;
+        }
+    }
 
     public int getRemittancesCaffeeCount() {
         EntityManager em = getEntityManager();

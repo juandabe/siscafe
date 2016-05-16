@@ -147,7 +147,7 @@ public class Shippers implements Serializable {
 
     @Override
     public String toString() {
-        return "siscafe.model.Shippers[ id=" + id + " ]";
+        return businessName;
     }
     
 }

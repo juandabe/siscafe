@@ -148,7 +148,7 @@ public class Departaments implements Serializable {
 
     @Override
     public String toString() {
-        return "siscafe.model.Departaments[ id=" + id + " ]";
+        return name;
     }
     
 }

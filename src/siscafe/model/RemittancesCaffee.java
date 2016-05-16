@@ -61,6 +61,8 @@ public class RemittancesCaffee implements Serializable {
     @Basic(optional = false)
     @Column(name = "lot_caffee")
     private String lotCaffee;
+    @Column(name = "quantity_radicated_bag_in")
+    private Integer quantityBagRadicatedIn;
     @Column(name = "quantity_bag_in_store")
     private Integer quantityBagInStore;
     @Column(name = "quantity_bag_out_store")
@@ -72,6 +74,10 @@ public class RemittancesCaffee implements Serializable {
     private Double totalWeightNetReal;
     @Column(name = "total_tare")
     private Double totalTare;
+    @Column(name = "quantity_in_pallet_caffee")
+    private Integer  quantityInPalletCaffee;
+    @Column(name = "quantity_out_pallet_caffee")
+    private Integer  quantityOutPalletCaffee;
     @Column(name = "source_location")
     private Integer sourceLocation;
     @Basic(optional = false)
@@ -99,6 +105,12 @@ public class RemittancesCaffee implements Serializable {
     @Basic(optional = false)
     @Column(name = "guide_id")
     private String guideId;
+    @Basic(optional = false)
+    @Column(name = "details_weight")
+    private String detailsWeight;
+    @Basic(optional = false)
+    @Column(name = "observation")
+    private String observation;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "remittancesCaffeeId")
     private List<WeighingDownloadCaffee> weighingDownloadCaffeeList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "remittancesCaffeeId")
@@ -170,8 +182,32 @@ public class RemittancesCaffee implements Serializable {
         this.guideId = guideId;
     }
 
+    public String getDetailsWeight() {
+        return detailsWeight;
+    }
+
+    public void setDetailsWeight(String detailsWeight) {
+        this.detailsWeight = detailsWeight;
+    }
+
+    public String getObservation() {
+        return observation;
+    }
+
+    public void setObservation(String observation) {
+        this.observation = observation;
+    }
+
     public Integer getId() {
         return id;
+    }
+
+    public Integer getQuantityBagRadicatedIn() {
+        return quantityBagRadicatedIn;
+    }
+
+    public void setQuantityBagRadicatedIn(Integer quantityBagRadicatedIn) {
+        this.quantityBagRadicatedIn = quantityBagRadicatedIn;
     }
 
     public void setId(Integer id) {
@@ -188,6 +224,22 @@ public class RemittancesCaffee implements Serializable {
 
     public Integer getQuantityBagInStore() {
         return quantityBagInStore;
+    }
+
+    public Integer getQuantityInPalletCaffee() {
+        return quantityInPalletCaffee;
+    }
+
+    public void setQuantityInPalletCaffee(Integer quantityInPalletCaffee) {
+        this.quantityInPalletCaffee = quantityInPalletCaffee;
+    }
+
+    public Integer getQuantityOutPalletCaffee() {
+        return quantityOutPalletCaffee;
+    }
+
+    public void setQuantityOutPalletCaffee(Integer quantityOutPalletCaffee) {
+        this.quantityOutPalletCaffee = quantityOutPalletCaffee;
     }
 
     public void setQuantityBagInStore(Integer quantityBagInStore) {

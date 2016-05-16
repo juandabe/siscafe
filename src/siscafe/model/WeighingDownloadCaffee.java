@@ -43,6 +43,8 @@ public class WeighingDownloadCaffee implements Serializable {
     @Column(name = "id")
     private Integer id;
     @Basic(optional = false)
+    @Column(name = "seq_weight_pallet")
+    private Integer seqWeightPallet;
     @Column(name = "weight_pallet")
     private double weightPallet;
     @Basic(optional = false)
@@ -61,6 +63,14 @@ public class WeighingDownloadCaffee implements Serializable {
 
     public WeighingDownloadCaffee(Integer id) {
         this.id = id;
+    }
+
+    public Integer getSeqWeightPallet() {
+        return seqWeightPallet;
+    }
+
+    public void setSeqWeightPallet(Integer seqWeightPallet) {
+        this.seqWeightPallet = seqWeightPallet;
     }
 
     public WeighingDownloadCaffee(Integer id, double weightPallet, int quantityBagPallet, Date weighingDate) {
