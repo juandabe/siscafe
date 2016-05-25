@@ -8,6 +8,7 @@ package siscafe.report;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.HashMap;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import net.sf.jasperreports.engine.JRException;
@@ -26,12 +27,14 @@ public class Reports {
     
     public void showReportDownloadCaffee() {
         try {
+            HashMap map = new HashMap();
+            map.put("REMITTANCE_ID","1600002"); 
             Connection conn =null;
             conn = DriverManager.getConnection("jdbc:mysql://192.168.35.213:3306/schema_siscafe?zeroDateTimeBehavior=convertToNull", "sop_user", "123");
             String path = new ReaderProperties().getProperties("REPORTDOWNLOADDIR");
             JasperReport report = null;
             report = (JasperReport) JRLoader.loadObjectFromFile(path);
-            JasperPrint print = JasperFillManager.fillReport(report, null, conn);
+            JasperPrint print = JasperFillManager.fillReport(report, map, conn);
             JasperViewer viewer = new JasperViewer(print,false);
             viewer.setTitle("Papeleta de repeso - Descargue");
             viewer.setVisible(true);
