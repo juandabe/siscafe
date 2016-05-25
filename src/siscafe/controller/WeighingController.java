@@ -20,6 +20,7 @@ import siscafe.model.Customs;
 import siscafe.model.MarkCaffee;
 import siscafe.model.RemittancesCaffee;
 import siscafe.model.Shippers;
+import siscafe.model.UnitsCaffee;
 import siscafe.model.Users;
 import siscafe.model.WeighingDownloadCaffee;
 import siscafe.persistence.CitySourceJpaController;
@@ -28,6 +29,7 @@ import siscafe.persistence.MarkCaffeeJpaController;
 import siscafe.persistence.RemittancesCaffeeJpaController;
 import siscafe.persistence.ShippersJpaController;
 import siscafe.persistence.WeighingDownloadCaffeeJpaController;
+import siscafe.report.Reports;
 import siscafe.util.BasculeSerialPort;
 import siscafe.util.MyComboBoxModel;
 import siscafe.view.frontend.WeighingView;
@@ -62,6 +64,12 @@ public class WeighingController implements ActionListener{
                 case "save":
                     saveDocumentationRemettancesCaffee();
                 break;
+                case "confirm":
+                    endProcessWeight();
+                break;
+                case "print":
+                    print();
+                break;
             }
         }
         else if (classUI.equals(JMenuItem.class)) {
@@ -76,11 +84,35 @@ public class WeighingController implements ActionListener{
     
     public void activeBascule() {
         try {
-            this.basculeSerialPort = new BasculeSerialPort(this.weighingView.jLabel1);
+            this.basculeSerialPort = new BasculeSerialPort(weighingView.jLabel1);
             this.basculeSerialPort.connect();
         } catch (Exception ex) {
             Logger.getLogger(WeighingController.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public void endProcessWeight() {
+        int bagsRadicated = remittancesCaffeeProcess.getQuantityBagRadicatedIn();
+        int bagsInStore = remittancesCaffeeProcess.getQuantityBagInStore();
+        if(bagsInStore == bagsRadicated) {
+            remittancesCaffeeProcess.setClosedDownloadCaffee(new Date());
+            try {
+                remittancesCaffeeJpaController.edit(remittancesCaffeeProcess);
+            } catch (Exception ex) {
+                Logger.getLogger(WeighingController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            JOptionPane.showMessageDialog(weighingView, "Finalizo proceso pesaje de la remesa "+remittancesCaffeeProcess.getId(), "Confirmación", JOptionPane.INFORMATION_MESSAGE);
+            refreshListInProcessWight();
+        }
+        else {
+            int balanceBags = bagsRadicated -= bagsInStore;
+            JOptionPane.showMessageDialog(weighingView, "No se puede finalizar el proceso de pesaje de la remesa "+remittancesCaffeeProcess.getId()+
+                    "; hacen falta pesar "+balanceBags+" sacos!", "Confirmación", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+    
+    private void print() {
+        new Reports().showReportDownloadCaffee();
     }
     
     private void toWeight() {
@@ -125,28 +157,34 @@ public class WeighingController implements ActionListener{
         }
         else {
             double newWeight = Double.valueOf(weighingView.jLabel1.getText());
-            weighingDownloadCaffee.setWeighingDate(dNow);
-            weighingDownloadCaffee.setRemittancesCaffeeId(remittancesCaffee);
-            int quantityBag = (int) weighingView.jSpinner1.getValue();
-            weighingDownloadCaffee.setQuantityBagPallet(quantityBag);
-            weighingDownloadCaffee.setWeightPallet(newWeight);
-            String numPalletString = String.valueOf(weighingDownloadCaffeeJpaController.countPalletByRemettencesCaffee(remittancesCaffee.getId()));
-            String numBagsString = String.valueOf(weighingDownloadCaffeeJpaController.countBagsByRemettencesCaffee(remittancesCaffee.getId()));
-            int numPalletInt = Integer.valueOf(numPalletString);
-            int numBagsInt = Integer.valueOf(numBagsString);
-            remittancesCaffee.setQuantityInPalletCaffee(numPalletInt+1);
-            remittancesCaffee.setQuantityBagInStore(numBagsInt+quantityBag);
-            weighingDownloadCaffee.setSeqWeightPallet(numPalletInt+1);
-            weighingDownloadCaffeeJpaController.create(weighingDownloadCaffee);
-            try {
-                remittancesCaffeeJpaController.edit(remittancesCaffee);
-            } catch (Exception ex) {
-                Logger.getLogger(WeighingController.class.getName()).log(Level.SEVERE, null, ex);
+            int bagsStoreNew = (int) weighingView.jSpinner1.getValue();
+            int bagsInStore = remittancesCaffee.getQuantityBagInStore();
+            int bagsRadicatedStore = remittancesCaffee.getQuantityBagRadicatedIn();
+            bagsInStore += bagsStoreNew;
+            if(bagsInStore < bagsRadicatedStore) {
+                weighingDownloadCaffee.setWeighingDate(dNow);
+                weighingDownloadCaffee.setRemittancesCaffeeId(remittancesCaffee);
+                weighingDownloadCaffee.setQuantityBagPallet(bagsStoreNew);
+                weighingDownloadCaffee.setWeightPallet(newWeight);
+                String numPalletString = String.valueOf(weighingDownloadCaffeeJpaController.countPalletByRemettencesCaffee(remittancesCaffee.getId()));
+                int numPalletInt = Integer.valueOf(numPalletString);
+                remittancesCaffee.setQuantityInPalletCaffee(numPalletInt+1);
+                remittancesCaffee.setQuantityBagInStore(bagsInStore);
+                weighingDownloadCaffee.setSeqWeightPallet(numPalletInt+1);
+                weighingDownloadCaffeeJpaController.create(weighingDownloadCaffee);
+                try {
+                    remittancesCaffeeJpaController.edit(remittancesCaffee);
+                } catch (Exception ex) {
+                    Logger.getLogger(WeighingController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                JOptionPane.showMessageDialog(weighingView, "Peso registrado!", "Confirmación", JOptionPane.INFORMATION_MESSAGE);
+                RemittancesCaffee remittancesCaffeeSelected = remittancesCaffeeJpaController.findRemittancesCaffee(remettancesId);
+                refreshListWightingRemettances(remittancesCaffeeSelected);
+                refreshListInProcessWight();  
             }
-            JOptionPane.showMessageDialog(weighingView, "Peso registrado!", "Confirmación", JOptionPane.INFORMATION_MESSAGE);
-            RemittancesCaffee remittancesCaffeeSelected = remittancesCaffeeJpaController.findRemittancesCaffee(remettancesId);
-            refreshListWightingRemettances(remittancesCaffeeSelected);
-            refreshListInProcessWight();
+            else {
+                JOptionPane.showMessageDialog(weighingView, "No se registro peso!", "Pesaje completado", JOptionPane.INFORMATION_MESSAGE);
+            }
         }
     }
     
@@ -170,6 +208,8 @@ public class WeighingController implements ActionListener{
     }
     
     public void initListener() {
+        weighingView.jButton3.addActionListener(this);
+        weighingView.jButton4.addActionListener(this);
         weighingView.jMenuItem4.addActionListener(this);
         weighingView.jButton1.addActionListener(this);
         weighingView.jButton2.addActionListener(this);
@@ -187,6 +227,10 @@ public class WeighingController implements ActionListener{
                 int remettancesId = Integer.valueOf(value);
                 weighingView.jTextField1.setText(value);
                 remittancesCaffeeProcess = remittancesCaffeeJpaController.findRemittancesCaffee(remettancesId);
+                UnitsCaffee unitsCaffee = remittancesCaffeeProcess.getUnitsCafeeId();
+                double newWeight = Double.valueOf(weighingView.jLabel1.getText());
+                double newBagsPallet = newWeight / unitsCaffee.getQuantity();
+                this.weighingView.jSpinner1.setValue(newBagsPallet);
                 refreshListWightingRemettances(remittancesCaffeeProcess);
                 CitySource citySource = remittancesCaffeeProcess.getCitySourceId();
                 weighingView.jTextField3.setText("");
@@ -403,4 +447,5 @@ public class WeighingController implements ActionListener{
     private CitySourceJpaController citySourceJpaController;
     private CustomsJpaController customsJpaController;
     private RemittancesCaffee remittancesCaffeeProcess;
+    //double newWeight = 1816.0;
 }

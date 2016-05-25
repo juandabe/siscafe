@@ -110,6 +110,7 @@ public class RemittancesCaffeeView extends javax.swing.JInternalFrame {
         jButton10.setIcon(new javax.swing.ImageIcon(getClass().getResource("/siscafe/images/search.png"))); // NOI18N
         jButton10.setFocusable(false);
         jButton10.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton10.setName("print"); // NOI18N
         jButton10.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar1.add(jButton10);
 
@@ -344,7 +345,7 @@ public class RemittancesCaffeeView extends javax.swing.JInternalFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton10;
+    public javax.swing.JButton jButton10;
     public javax.swing.JButton jButton2;
     public javax.swing.JButton jButton3;
     public javax.swing.JButton jButton4;

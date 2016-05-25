@@ -13,6 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import siscafe.controller.CategoryPermitsController;
 import siscafe.controller.CitySourceController;
 import siscafe.controller.ClientsController;
 import siscafe.controller.CustomsController;
@@ -58,6 +59,7 @@ import siscafe.model.Users;
 import siscafe.model.WeighingDownloadCaffee;
 import siscafe.persistence.CategoryPermitsJpaController;
 import siscafe.util.ClockPartFrontendView;
+import siscafe.util.ReaderProperties;
 
 
 /**
@@ -150,8 +152,6 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jSeparator3 = new javax.swing.JToolBar.Separator();
-        jLabel7 = new javax.swing.JLabel();
-        jSeparator6 = new javax.swing.JToolBar.Separator();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Frontend");
@@ -217,10 +217,6 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
         jLabel5.setText("gamma.copcsa.com");
         jToolBar2.add(jLabel5);
         jToolBar2.add(jSeparator3);
-
-        jLabel7.setText("conectado ");
-        jToolBar2.add(jLabel7);
-        jToolBar2.add(jSeparator6);
 
         jSplitPane2.setLeftComponent(jToolBar2);
 
@@ -462,8 +458,9 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
             case "Radicar Café":
                 remittancesCaffeeModel = new RemittancesCaffee();
                 remittancesCaffeeView = new RemittancesCaffeeView();
+                pDFPanelViewerView = new PDFPanelViewerView();
                 jDesktopPane1.removeAll();
-                remittancesCaffeeController = new RemittancesCaffeeController(remittancesCaffeeModel, remittancesCaffeeView);
+                remittancesCaffeeController = new RemittancesCaffeeController(remittancesCaffeeModel, pDFPanelViewerView, remittancesCaffeeView);
                 remittancesCaffeeController.initListener();
                 jDesktopPane1.add(remittancesCaffeeView);
                 remittancesCaffeeView.setVisible(true);
@@ -479,6 +476,16 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
                 citySourceView.setVisible(true);
                 jLabel2.setText("Ciudades origenes");
                 break;
+            case "Categoria Permisos":
+                categoryPermitsModel = new CategoryPermits();
+                categoryPermitsView = new CategoryPermitsView();
+                jDesktopPane1.removeAll();
+                categoryPermitsController = new CategoryPermitsController(categoryPermitsModel, categoryPermitsView);
+                categoryPermitsController.initListener();
+                jDesktopPane1.add(categoryPermitsView);
+                categoryPermitsView.setVisible(true);
+                jLabel2.setText("Categoria Permisos");
+                break;
             case "Salir":
                 int response = JOptionPane.showConfirmDialog(this, "¿Desea salir del sistema?", "Confirmación", JOptionPane.OK_CANCEL_OPTION);
                 if(response == 0) {
@@ -490,60 +497,9 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
         }
     }//GEN-LAST:event_jTree2ValueChanged
 
-    
-    
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Windows".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Frontend.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Frontend.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Frontend.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Frontend.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                Frontend frontend = new Frontend();
-                frontend.initConfig();
-                frontend.setVisible(true);
-            }
-        });
-    }
-    
+    private CategoryPermitsController categoryPermitsController;
+    private CategoryPermitsView categoryPermitsView;
+    private CategoryPermits categoryPermitsModel;
     private WeighingDownloadCaffee weighingDownloadCaffee;
     private PackingCaffeeView packingCaffeeView;
     private PackingCaffeeController packingCaffeeController;
@@ -551,6 +507,7 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
     private RemittancesCaffeeView remittancesCaffeeView;
     private RemittancesCaffeeController remittancesCaffeeController;
     private RemittancesCaffee remittancesCaffeeModel;
+    private PDFPanelViewerView pDFPanelViewerView;
     private NoveltysCaffeeController noveltysCaffeeController;
     private NoveltysCaffeeView noveltysCaffeeView;
     private NoveltysCaffee noveltysCaffeeModel;
@@ -620,12 +577,10 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JToolBar.Separator jSeparator2;
     private javax.swing.JToolBar.Separator jSeparator3;
-    private javax.swing.JToolBar.Separator jSeparator6;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JSplitPane jSplitPane2;
     private javax.swing.JToolBar jToolBar1;

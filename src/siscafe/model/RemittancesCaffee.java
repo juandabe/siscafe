@@ -111,6 +111,10 @@ public class RemittancesCaffee implements Serializable {
     @Basic(optional = false)
     @Column(name = "observation")
     private String observation;
+    @Basic(optional = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "closed_download_caffee")
+    private Date closedDownloadCaffee;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "remittancesCaffeeId")
     private List<WeighingDownloadCaffee> weighingDownloadCaffeeList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "remittancesCaffeeId")
@@ -170,6 +174,14 @@ public class RemittancesCaffee implements Serializable {
 
     public RemittancesCaffee(Integer id) {
         this.id = id;
+    }
+
+    public Date getClosedDownloadCaffee() {
+        return closedDownloadCaffee;
+    }
+
+    public void setClosedDownloadCaffee(Date closedDownloadCaffee) {
+        this.closedDownloadCaffee = closedDownloadCaffee;
     }
 
     public RemittancesCaffee(Integer id, String lotCaffee, String autoOtm, Date createdDate, Date updatedDated, boolean isActive, String guideId) {
