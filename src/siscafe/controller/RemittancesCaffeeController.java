@@ -48,6 +48,7 @@ import siscafe.persistence.SlotStoreJpaController;
 import siscafe.persistence.StoresCaffeeJpaController;
 import siscafe.persistence.UnitsCaffeeJpaController;
 import siscafe.persistence.UsersJpaController;
+import siscafe.report.Reports;
 import siscafe.util.MyComboBoxModel;
 import siscafe.util.ReaderProperties;
 import siscafe.view.frontend.PDFPanelViewerView;
@@ -104,9 +105,6 @@ public class RemittancesCaffeeController  implements ActionListener, ListSelecti
             break;
             case "getSlot":
                 getSlot();
-            break;
-            case "print":
-              //showPdfRemettance();
             break;
         }
     }
@@ -180,6 +178,7 @@ public class RemittancesCaffeeController  implements ActionListener, ListSelecti
         remittancesCaffee.setTotalWeightNetNominal(weightCaffeeNominal);
         remittancesCaffee.setIsActive(true);
         remittancesCaffee.setTotalTare(0.0);
+        remittancesCaffee.setQuantityBagInStore(0);
         remittancesCaffee.setQuantityBagOutStore(0);
         remittancesCaffee.setTotalWeightNetReal(0.0);
         remittancesCaffee.setQuantityInPalletCaffee(0);
@@ -192,7 +191,8 @@ public class RemittancesCaffeeController  implements ActionListener, ListSelecti
         finally {
             RemittancesCaffee remittancesCaffeeCreated = remittancesCaffeeJpaController.findRemittancesCaffeeByGuidedAndLot(guideId, lotCaffee);
             remittancesCaffeeView.jTextField9.setText(String.valueOf(remittancesCaffeeCreated.getId()));
-            createPdfRemettance(remittancesCaffeeCreated);
+            //createPdfRemettance(remittancesCaffeeCreated);
+            new Reports().showReportRemittancesCaffeeRadicated(remittancesCaffeeCreated);
             JOptionPane.showInternalMessageDialog(remittancesCaffeeView, "Registro creado", 
                 "Confirmación", JOptionPane.INFORMATION_MESSAGE);
         }

@@ -112,7 +112,7 @@ public class WeighingController implements ActionListener{
     }
     
     private void print() {
-        new Reports().showReportDownloadCaffee();
+        new Reports().showReportDownloadCaffee(remittancesCaffeeProcess);
     }
     
     private void toWeight() {
@@ -123,8 +123,8 @@ public class WeighingController implements ActionListener{
         remittancesCaffee = remittancesCaffeeJpaController.findRemittancesCaffee(remettancesId);
         if(weighingView.jCheckBox1.isSelected()) {
             double oldTare = remittancesCaffee.getTotalTare();
-            double newTare = Double.valueOf(weighingView.jLabel1.getText());
-            //double newTare = 816.0;
+            //double newTare = Double.valueOf(weighingView.jLabel1.getText());
+            double newTare = 816.0;
             if(oldTare != 0) {
                 int selectionAnswer = JOptionPane.showInternalConfirmDialog(weighingView, "¿La remesa #"+remettancesId+" tiene una tara registrada de "+oldTare+"; ¿Desea modificarla?", "Confirmación", JOptionPane.YES_NO_OPTION);
                 if(selectionAnswer == 0) {
@@ -156,24 +156,25 @@ public class WeighingController implements ActionListener{
             }
         }
         else {
-            double newWeight = Double.valueOf(weighingView.jLabel1.getText());
-            int bagsStoreNew = (int) weighingView.jSpinner1.getValue();
-            int bagsInStore = remittancesCaffee.getQuantityBagInStore();
-            int bagsRadicatedStore = remittancesCaffee.getQuantityBagRadicatedIn();
-            bagsInStore += bagsStoreNew;
+            //double newWeight = Double.valueOf(weighingView.jLabel1.getText());
+            double numBagsJpinner = Double.parseDouble(weighingView.jSpinner1.getValue().toString());
+            int bagsStoreNew = (int)(numBagsJpinner);
+            int bagsInStore = remittancesCaffeeProcess.getQuantityBagInStore();
+            int bagsRadicatedStore = remittancesCaffeeProcess.getQuantityBagRadicatedIn();
             if(bagsInStore < bagsRadicatedStore) {
+                bagsInStore += bagsStoreNew;
                 weighingDownloadCaffee.setWeighingDate(dNow);
-                weighingDownloadCaffee.setRemittancesCaffeeId(remittancesCaffee);
+                weighingDownloadCaffee.setRemittancesCaffeeId(remittancesCaffeeProcess);
                 weighingDownloadCaffee.setQuantityBagPallet(bagsStoreNew);
                 weighingDownloadCaffee.setWeightPallet(newWeight);
                 String numPalletString = String.valueOf(weighingDownloadCaffeeJpaController.countPalletByRemettencesCaffee(remittancesCaffee.getId()));
                 int numPalletInt = Integer.valueOf(numPalletString);
-                remittancesCaffee.setQuantityInPalletCaffee(numPalletInt+1);
-                remittancesCaffee.setQuantityBagInStore(bagsInStore);
+                remittancesCaffeeProcess.setQuantityInPalletCaffee(numPalletInt+1);
+                remittancesCaffeeProcess.setQuantityBagInStore(bagsInStore);
                 weighingDownloadCaffee.setSeqWeightPallet(numPalletInt+1);
                 weighingDownloadCaffeeJpaController.create(weighingDownloadCaffee);
                 try {
-                    remittancesCaffeeJpaController.edit(remittancesCaffee);
+                    remittancesCaffeeJpaController.edit(remittancesCaffeeProcess);
                 } catch (Exception ex) {
                     Logger.getLogger(WeighingController.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -183,7 +184,7 @@ public class WeighingController implements ActionListener{
                 refreshListInProcessWight();  
             }
             else {
-                JOptionPane.showMessageDialog(weighingView, "No se registro peso!", "Pesaje completado", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(weighingView, "No se registro peso!", "Pesaje completo", JOptionPane.INFORMATION_MESSAGE);
             }
         }
     }
@@ -228,9 +229,9 @@ public class WeighingController implements ActionListener{
                 weighingView.jTextField1.setText(value);
                 remittancesCaffeeProcess = remittancesCaffeeJpaController.findRemittancesCaffee(remettancesId);
                 UnitsCaffee unitsCaffee = remittancesCaffeeProcess.getUnitsCafeeId();
-                double newWeight = Double.valueOf(weighingView.jLabel1.getText());
+                //double newWeight = Double.valueOf(weighingView.jLabel1.getText());
                 double newBagsPallet = newWeight / unitsCaffee.getQuantity();
-                this.weighingView.jSpinner1.setValue(newBagsPallet);
+                this.weighingView.jSpinner1.setValue(Math.ceil(newBagsPallet));
                 refreshListWightingRemettances(remittancesCaffeeProcess);
                 CitySource citySource = remittancesCaffeeProcess.getCitySourceId();
                 weighingView.jTextField3.setText("");
@@ -447,5 +448,5 @@ public class WeighingController implements ActionListener{
     private CitySourceJpaController citySourceJpaController;
     private CustomsJpaController customsJpaController;
     private RemittancesCaffee remittancesCaffeeProcess;
-    //double newWeight = 1816.0;
+    double newWeight = 1816.0;
 }
