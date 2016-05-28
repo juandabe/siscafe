@@ -289,7 +289,7 @@ public class RemittancesCaffeeJpaController implements Serializable {
     
     public List<RemittancesCaffee> findRemittancesCaffeePendientWeight() {
         EntityManager em = getEntityManager();
-        Query query = em.createQuery("SELECT r FROM RemittancesCaffee r  WHERE r.downloadCaffeeDate IS NULL and r.isActive=true");
+        Query query = em.createQuery("SELECT r FROM RemittancesCaffee r  WHERE r.statusOperation=1 and r.isActive=true");
         try {
             return (List<RemittancesCaffee>) query.getResultList();
         }
@@ -300,7 +300,7 @@ public class RemittancesCaffeeJpaController implements Serializable {
     
     public List<RemittancesCaffee> findRemittancesCaffeeInProcessWieght() {
         EntityManager em = getEntityManager();
-        Query query = em.createQuery("SELECT r FROM RemittancesCaffee r  WHERE r.downloadCaffeeDate IS NOT NULL and r.closedDownloadCaffee IS NULL and r.isActive=true");
+        Query query = em.createQuery("SELECT r FROM RemittancesCaffee r  WHERE r.statusOperation=2 and r.isActive=true");
         try {
             return (List<RemittancesCaffee>) query.getResultList();
         }

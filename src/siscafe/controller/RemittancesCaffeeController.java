@@ -176,6 +176,7 @@ public class RemittancesCaffeeController  implements ActionListener, ListSelecti
         remittancesCaffee.setStaffSampleId(findUsersByNameLocal(samplerUsers));
         Double weightCaffeeNominal = unitsCaffeeLocal.getQuantity()*(Double.valueOf(this.remittancesCaffeeView.jTextField10.getText()));
         remittancesCaffee.setTotalWeightNetNominal(weightCaffeeNominal);
+        remittancesCaffee.setStatusOperation(Integer.valueOf(new ReaderProperties().getProperties("STATUS_CAFFEE_RADICATED")));
         remittancesCaffee.setIsActive(true);
         remittancesCaffee.setTotalTare(0.0);
         remittancesCaffee.setQuantityBagInStore(0);

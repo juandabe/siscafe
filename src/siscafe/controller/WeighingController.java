@@ -32,6 +32,7 @@ import siscafe.persistence.WeighingDownloadCaffeeJpaController;
 import siscafe.report.Reports;
 import siscafe.util.BasculeSerialPort;
 import siscafe.util.MyComboBoxModel;
+import siscafe.util.ReaderProperties;
 import siscafe.view.frontend.WeighingView;
 
 /**
@@ -95,7 +96,7 @@ public class WeighingController implements ActionListener{
         int bagsRadicated = remittancesCaffeeProcess.getQuantityBagRadicatedIn();
         int bagsInStore = remittancesCaffeeProcess.getQuantityBagInStore();
         if(bagsInStore == bagsRadicated) {
-            remittancesCaffeeProcess.setClosedDownloadCaffee(new Date());
+            remittancesCaffeeProcess.setStatusOperation(Integer.valueOf(new ReaderProperties().getProperties("STATUS_CAFFEE_WEIGHTCOMPLETED")));
             try {
                 remittancesCaffeeJpaController.edit(remittancesCaffeeProcess);
             } catch (Exception ex) {
@@ -172,6 +173,7 @@ public class WeighingController implements ActionListener{
                 remittancesCaffeeProcess.setQuantityInPalletCaffee(numPalletInt+1);
                 remittancesCaffeeProcess.setQuantityBagInStore(bagsInStore);
                 weighingDownloadCaffee.setSeqWeightPallet(numPalletInt+1);
+                remittancesCaffeeProcess.setDownloadCaffeeDate(new Date());
                 weighingDownloadCaffeeJpaController.create(weighingDownloadCaffee);
                 try {
                     remittancesCaffeeJpaController.edit(remittancesCaffeeProcess);
@@ -266,7 +268,7 @@ public class WeighingController implements ActionListener{
                 if(selectionAnswer == 0) {
                     try {
                         RemittancesCaffee remittancesCaffeeSelected = remittancesCaffeeJpaController.findRemittancesCaffee(remettancesId);
-                        remittancesCaffeeSelected.setDownloadCaffeeDate(new Date());
+                        remittancesCaffeeSelected.setStatusOperation(Integer.valueOf(new ReaderProperties().getProperties("STATUS_CAFFFE_WEIGHTPROCESSING")));
                         remittancesCaffeeSelected.setStaffWtInId(basculeUser);
                         remittancesCaffeeJpaController.edit(remittancesCaffeeSelected);
                         refresh();

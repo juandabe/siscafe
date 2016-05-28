@@ -112,9 +112,8 @@ public class RemittancesCaffee implements Serializable {
     @Column(name = "observation")
     private String observation;
     @Basic(optional = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "closed_download_caffee")
-    private Date closedDownloadCaffee;
+    @Column(name = "status_operation")
+    private int statusOperation;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "remittancesCaffeeId")
     private List<WeighingDownloadCaffee> weighingDownloadCaffeeList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "remittancesCaffeeId")
@@ -176,12 +175,12 @@ public class RemittancesCaffee implements Serializable {
         this.id = id;
     }
 
-    public Date getClosedDownloadCaffee() {
-        return closedDownloadCaffee;
+    public int getStatusOperation() {
+        return statusOperation;
     }
 
-    public void setClosedDownloadCaffee(Date closedDownloadCaffee) {
-        this.closedDownloadCaffee = closedDownloadCaffee;
+    public void setStatusOperation(int statusOperation) {
+        this.statusOperation = statusOperation;
     }
 
     public RemittancesCaffee(Integer id, String lotCaffee, String autoOtm, Date createdDate, Date updatedDated, boolean isActive, String guideId) {
