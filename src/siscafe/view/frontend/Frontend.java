@@ -190,7 +190,7 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
 
         jSplitPane1.setRightComponent(jDesktopPane1);
 
-        jSplitPane2.setDividerLocation(1000);
+        jSplitPane2.setDividerLocation(700);
 
         jToolBar1.setFloatable(false);
 

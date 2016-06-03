@@ -5,10 +5,14 @@
  */
 package siscafe.report;
 
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -25,9 +29,34 @@ import siscafe.util.ReaderProperties;
  */
 public class Reports {
     
+    public Reports () {
+        
+    }
+    
+    public void showReportDaylyDownloadCaffee(Date startDate, Date endDate, String startStore, String endStore) {
+        try {
+            HashMap map = new HashMap();
+            map.put("START_DATE",startDate);
+            map.put("END_DATE",endDate);
+            map.put("START_STORE",startStore);
+            map.put("END_STORE",endStore);
+            Connection conn =null;
+            conn = DriverManager.getConnection("jdbc:mysql://192.168.35.213:3306/schema_siscafe?zeroDateTimeBehavior=convertToNull", "sop_user", "123");
+            String path = new ReaderProperties().getProperties("DAYLYDOWNLOADCAFFEE");
+            JasperReport report = null;
+            report = (JasperReport) JRLoader.loadObjectFromFile(path);
+            JasperPrint print = JasperFillManager.fillReport(report, map, conn);
+            JasperViewer viewer = new JasperViewer(print,false);
+            viewer.setTitle("Descargue de Café en Bodega - Descargue");
+            viewer.setVisible(true);
+        }
+        catch (SQLException | JRException e){
+            JOptionPane.showMessageDialog(null, "Error al general el reporte: \n"+e.getMessage(), "Información", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+    
     public void showReportDownloadCaffee(RemittancesCaffee remittancesCaffee) {
         try {
-            System.out.println(remittancesCaffee.getId());
             String remittancesCaffeeId = String.valueOf(remittancesCaffee.getId());
             HashMap map = new HashMap();
             map.put("REMITTANCE_ID",remittancesCaffeeId); 
@@ -42,7 +71,7 @@ public class Reports {
             viewer.setVisible(true);
         }
         catch (SQLException | JRException e){
-            JOptionPane.showMessageDialog(null, "Error al general el reporte", "Información", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Error al general el reporte: \n"+e.getMessage(), "Información", JOptionPane.INFORMATION_MESSAGE);
         }
     }
     
@@ -62,7 +91,7 @@ public class Reports {
             viewer.setVisible(true);
         }
         catch (SQLException | JRException e){
-            JOptionPane.showMessageDialog(null, "Error al general el reporte", "Información", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Error al general el reporte:\n"+e.getMessage(), "Información", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 }
