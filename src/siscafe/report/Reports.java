@@ -5,14 +5,11 @@
  */
 package siscafe.report;
 
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -33,13 +30,14 @@ public class Reports {
         
     }
     
-    public void showReportDaylyDownloadCaffee(Date startDate, Date endDate, String startStore, String endStore) {
+    public void showReportDaylyDownloadCaffee(String startDate, String endDate, String startStore, String endStore, String username) {
         try {
             HashMap map = new HashMap();
             map.put("START_DATE",startDate);
             map.put("END_DATE",endDate);
             map.put("START_STORE",startStore);
             map.put("END_STORE",endStore);
+            map.put("username",username);
             Connection conn =null;
             conn = DriverManager.getConnection("jdbc:mysql://192.168.35.213:3306/schema_siscafe?zeroDateTimeBehavior=convertToNull", "sop_user", "123");
             String path = new ReaderProperties().getProperties("DAYLYDOWNLOADCAFFEE");
@@ -47,6 +45,7 @@ public class Reports {
             report = (JasperReport) JRLoader.loadObjectFromFile(path);
             JasperPrint print = JasperFillManager.fillReport(report, map, conn);
             JasperViewer viewer = new JasperViewer(print,false);
+            viewer.setExtendedState(JFrame.MAXIMIZED_BOTH);
             viewer.setTitle("Descargue de Café en Bodega - Descargue");
             viewer.setVisible(true);
         }
@@ -59,7 +58,7 @@ public class Reports {
         try {
             String remittancesCaffeeId = String.valueOf(remittancesCaffee.getId());
             HashMap map = new HashMap();
-            map.put("REMITTANCE_ID",remittancesCaffeeId); 
+            map.put("REMITTANCE_ID",remittancesCaffeeId);
             Connection conn =null;
             conn = DriverManager.getConnection("jdbc:mysql://192.168.35.213:3306/schema_siscafe?zeroDateTimeBehavior=convertToNull", "sop_user", "123");
             String path = new ReaderProperties().getProperties("REPORTDOWNLOADDIR");
@@ -67,6 +66,7 @@ public class Reports {
             report = (JasperReport) JRLoader.loadObjectFromFile(path);
             JasperPrint print = JasperFillManager.fillReport(report, map, conn);
             JasperViewer viewer = new JasperViewer(print,false);
+            viewer.setExtendedState(JFrame.MAXIMIZED_BOTH);
             viewer.setTitle("Papeleta de repeso - Descargue");
             viewer.setVisible(true);
         }
@@ -75,11 +75,12 @@ public class Reports {
         }
     }
     
-    public void showReportRemittancesCaffeeRadicated(RemittancesCaffee remittancesCaffee) {
+    public void showReportRemittancesCaffeeRadicated(RemittancesCaffee remittancesCaffee, String username) {
         try {
             String remittancesCaffeeId = String.valueOf(remittancesCaffee.getId());
             HashMap map = new HashMap();
-            map.put("REMITTANCES_ID",remittancesCaffeeId); 
+            map.put("REMITTANCES_ID",remittancesCaffeeId);
+            map.put("username",username);
             Connection conn =null;
             conn = DriverManager.getConnection("jdbc:mysql://192.168.35.213:3306/schema_siscafe?zeroDateTimeBehavior=convertToNull", "sop_user", "123");
             String path = new ReaderProperties().getProperties("REPORTREMITTANCESCAFFEERADICATED");
@@ -87,7 +88,50 @@ public class Reports {
             report = (JasperReport) JRLoader.loadObjectFromFile(path);
             JasperPrint print = JasperFillManager.fillReport(report, map, conn);
             JasperViewer viewer = new JasperViewer(print,false);
+            viewer.setExtendedState(JFrame.MAXIMIZED_BOTH);
             viewer.setTitle("Documento de radicación Café - Descargue");
+            viewer.setVisible(true);
+        }
+        catch (SQLException | JRException e){
+            JOptionPane.showMessageDialog(null, "Error al general el reporte:\n"+e.getMessage(), "Información", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+    
+    public void showFullConsulttRemittancesCaffee(String remittancesCaffee, String username) {
+        try {
+            HashMap map = new HashMap();
+            map.put("REMMITANCE_ID",remittancesCaffee);
+            map.put("username",username);
+            Connection conn =null;
+            conn = DriverManager.getConnection("jdbc:mysql://192.168.35.213:3306/schema_siscafe?zeroDateTimeBehavior=convertToNull", "sop_user", "123");
+            String path = new ReaderProperties().getProperties("REMITTANCESCAFFE_DETAILS");
+            JasperReport report = null;
+            report = (JasperReport) JRLoader.loadObjectFromFile(path);
+            JasperPrint print = JasperFillManager.fillReport(report, map, conn);
+            JasperViewer viewer = new JasperViewer(print,false);
+            viewer.setExtendedState(JFrame.MAXIMIZED_BOTH);
+            viewer.setTitle("Detalle operación "+remittancesCaffee+" - Consulta");
+            viewer.setVisible(true);
+        }
+        catch (SQLException | JRException e){
+            JOptionPane.showMessageDialog(null, "Error al general el reporte:\n"+e.getMessage(), "Información", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+    
+    public void reportCommodityCaffeeDeliver(String DEX_code, String username) {
+        try {
+            HashMap map = new HashMap();
+            map.put("DEX",DEX_code);
+            map.put("username",username);
+            Connection conn =null;
+            conn = DriverManager.getConnection("jdbc:mysql://192.168.35.213:3306/schema_siscafe?zeroDateTimeBehavior=convertToNull", "sop_user", "123");
+            String path = new ReaderProperties().getProperties("COMMODITYCAFFEEDLIVER");
+            JasperReport report = null;
+            report = (JasperReport) JRLoader.loadObjectFromFile(path);
+            JasperPrint print = JasperFillManager.fillReport(report, map, conn);
+            JasperViewer viewer = new JasperViewer(print,false);
+            viewer.setExtendedState(JFrame.MAXIMIZED_BOTH);
+            viewer.setTitle("Order Interna de Entrega "+DEX_code+" - Reporte");
             viewer.setVisible(true);
         }
         catch (SQLException | JRException e){

@@ -6,7 +6,6 @@
 package siscafe.controller;
 
 import com.itextpdf.text.BaseColor;
-import com.qoppa.pdfViewer.PDFViewerBean;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Font;
@@ -18,7 +17,6 @@ import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
-import java.io.File;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileOutputStream;
@@ -51,7 +49,6 @@ import siscafe.persistence.UsersJpaController;
 import siscafe.report.Reports;
 import siscafe.util.MyComboBoxModel;
 import siscafe.util.ReaderProperties;
-import siscafe.view.frontend.PDFPanelViewerView;
 import siscafe.view.frontend.RemittancesCaffeeView;
 
 /**
@@ -60,7 +57,7 @@ import siscafe.view.frontend.RemittancesCaffeeView;
  */
 public class RemittancesCaffeeController  implements ActionListener, ListSelectionListener{
 
-    public RemittancesCaffeeController (RemittancesCaffee remittancesCaffee, PDFPanelViewerView pDFPanelViewerView, RemittancesCaffeeView remittancesCaffeeView) {
+    public RemittancesCaffeeController (RemittancesCaffee remittancesCaffee, String username, RemittancesCaffeeView remittancesCaffeeView) {
         this.remittancesCaffee = remittancesCaffee;
         this.remittancesCaffeeView = remittancesCaffeeView;
         remittancesCaffeeJpaController = new RemittancesCaffeeJpaController(Persistence.createEntityManagerFactory( "SISCAFE" ));
@@ -74,6 +71,7 @@ public class RemittancesCaffeeController  implements ActionListener, ListSelecti
     }
     
     public void initListener() {
+        remittancesCaffeeView.jButton6.addActionListener(this);
         remittancesCaffeeView.jButton4.addActionListener(this);
         remittancesCaffeeView.jButton2.addActionListener(this);
         remittancesCaffeeView.jButton3.addActionListener(this);
@@ -100,9 +98,6 @@ public class RemittancesCaffeeController  implements ActionListener, ListSelecti
             case "clear":
                 //clear();
             break;
-            case "delete":
-                //clear();
-            break;
             case "getSlot":
                 getSlot();
             break;
@@ -115,8 +110,8 @@ public class RemittancesCaffeeController  implements ActionListener, ListSelecti
         listUnitsCaffee = unitsCaffeeJpaController.findUnitsCaffeeEntities();
         listStoresCaffee = storesCaffeeJpaController.findStoresCaffeeEntities();
         listSlotStore = slotStoreJpaController.findSlotStoreEntities();
-        listUserDriver = usersJpaController.findUsersByProfiles(profilesJpaController.findProfiles(5));
-        listUserSampler = usersJpaController.findUsersByProfiles(profilesJpaController.findProfiles(6));
+        listUserDriver = usersJpaController.findUsersByProfiles(profilesJpaController.findProfiles(3));
+        listUserSampler = usersJpaController.findUsersByProfiles(profilesJpaController.findProfiles(4));
         listUsers = usersJpaController.findUsersEntities();
         myComboBoxModelClients = new MyComboBoxModel(listClients);
         remittancesCaffeeView.jComboBox1.setModel(myComboBoxModelClients);
@@ -178,12 +173,14 @@ public class RemittancesCaffeeController  implements ActionListener, ListSelecti
         remittancesCaffee.setTotalWeightNetNominal(weightCaffeeNominal);
         remittancesCaffee.setStatusOperation(Integer.valueOf(new ReaderProperties().getProperties("STATUS_CAFFEE_RADICATED")));
         remittancesCaffee.setIsActive(true);
-        remittancesCaffee.setTotalTare(0.0);
+        remittancesCaffee.setTotalTare(0);
         remittancesCaffee.setQuantityBagInStore(0);
         remittancesCaffee.setQuantityBagOutStore(0);
         remittancesCaffee.setTotalWeightNetReal(0.0);
         remittancesCaffee.setQuantityInPalletCaffee(0);
         remittancesCaffee.setQuantityOutPalletCaffee(0);
+        remittancesCaffee.setTareDownload(0.0);
+        remittancesCaffee.setTarePackaging(0.0);
         try {
             remittancesCaffeeJpaController.create(remittancesCaffee);
         } catch (Exception ex) {
@@ -193,7 +190,7 @@ public class RemittancesCaffeeController  implements ActionListener, ListSelecti
             RemittancesCaffee remittancesCaffeeCreated = remittancesCaffeeJpaController.findRemittancesCaffeeByGuidedAndLot(guideId, lotCaffee);
             remittancesCaffeeView.jTextField9.setText(String.valueOf(remittancesCaffeeCreated.getId()));
             //createPdfRemettance(remittancesCaffeeCreated);
-            new Reports().showReportRemittancesCaffeeRadicated(remittancesCaffeeCreated);
+            new Reports().showReportRemittancesCaffeeRadicated(remittancesCaffeeCreated, username);
             JOptionPane.showInternalMessageDialog(remittancesCaffeeView, "Registro creado", 
                 "Confirmación", JOptionPane.INFORMATION_MESSAGE);
         }
@@ -233,58 +230,6 @@ public class RemittancesCaffeeController  implements ActionListener, ListSelecti
             this.remittancesCaffeeView.jTextField10.setText(String.valueOf(remittancesCaffeeSelected.getQuantityBagInStore()));
             remittancesCaffeeView.jComboBox3.setSelectedItem(remittancesCaffeeSelected.getUnitsCafeeId());
         }
-    }
-    
-    public void createPdfRemettance(RemittancesCaffee remittancesCaffee) {
-        try {
-            createPdf(remittancesCaffee);
-        } catch (DocumentException | IOException ex) {
-            Logger.getLogger(RemittancesCaffeeController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    
-    private void createPdf(RemittancesCaffee remittancesCaffee) throws IOException, DocumentException {
-        String dest = new ReaderProperties().getProperties("REMETTENCESPDFDIR")+"\\"+remittancesCaffee.getId()+".pdf";
-        Font fontTitle = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 24, BaseColor.BLACK);
-        Font fontContend = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 24, BaseColor.BLACK);
-        Document document = new Document();
-        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(dest));
-        document.open();
-        PdfContentByte cb = writer.getDirectContent();
-        PdfPTable table = new PdfPTable(2);
-        
-        table.addCell(new Phrase("FECHA RADICADO:",fontTitle));
-        PdfPCell cell = new PdfPCell(new Phrase(remittancesCaffee.getCreatedDate().toLocaleString(), fontContend));
-        table.addCell(cell);
-        
-        table.addCell(new Phrase("REMESA:",fontTitle));
-        Barcode128 code128 = new Barcode128();
-        code128.setFont(null);
-        code128.setCode(String.valueOf(remittancesCaffee.getId()));
-        code128.setCodeType(Barcode128.CODE128);
-        Image code128Image = code128.createImageWithBarcode(cb, null, null);
-        cell = new PdfPCell();
-        cell.addElement(new Phrase(String.valueOf(remittancesCaffee.getId())));
-        cell.addElement(code128Image);
-        table.addCell(cell);
-        
-        table.addCell(new Phrase("LOTE:",fontTitle));
-        cell = new PdfPCell(new Phrase(remittancesCaffee.getLotCaffee(),fontContend));
-        table.addCell(cell);
-        
-        table.addCell(new Phrase("CANTIDAD:",fontTitle));
-        cell = new PdfPCell(new Phrase(String.valueOf(remittancesCaffee.getQuantityBagRadicatedIn()),fontContend));
-        table.addCell(cell);
-        
-        table.addCell(new Phrase("MOTORISTA:",fontTitle));
-        cell = new PdfPCell(new Phrase(remittancesCaffee.getStaffDriverId().getFirstName()+" "+remittancesCaffee.getStaffDriverId().getLastName(),fontContend));
-        table.addCell(cell);
-        
-        table.addCell(new Phrase("MUESTREADOR:",fontTitle));
-        cell = new PdfPCell(new Phrase(remittancesCaffee.getStaffSampleId().getFirstName()+" "+remittancesCaffee.getStaffSampleId().getLastName(),fontContend));
-        table.addCell(cell);
-        document.add(table);
-        document.close();
     }
     
     private StoresCaffee findStoresCaffeeByNameLocal(String name) {
@@ -372,11 +317,12 @@ public class RemittancesCaffeeController  implements ActionListener, ListSelecti
         return remittancesCaffeeLocal;
     }
     
+    private String username;
     private MyComboBoxModel myComboBoxModelUnitsCaffee;
     private MyComboBoxModel myComboBoxModelClients;
     private MyComboBoxModel myComboBoxModelStoresCaffee;
     private MyComboBoxModel myComboBoxModelPackingCaffee;
-    private MyComboBoxModel myComboBoxModelSlotStore;
+    private MyComboBoxModel myComboBoxModelStoreCaffees;
     private MyComboBoxModel myComboBoxModelDriver;
     private MyComboBoxModel myComboBoxModelSample;
     private List <Users> listUsers;

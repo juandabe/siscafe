@@ -43,7 +43,6 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Clients.findByCreatedDate", query = "SELECT c FROM Clients c WHERE c.createdDate = :createdDate"),
     @NamedQuery(name = "Clients.findByUpdatedDate", query = "SELECT c FROM Clients c WHERE c.updatedDate = :updatedDate")})
 public class Clients implements Serializable {
-    private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
@@ -57,9 +56,6 @@ public class Clients implements Serializable {
     private String emails;
     @Column(name = "contact_name")
     private String contactName;
-    @Basic(optional = false)
-    @Column(name = "exporter_code")
-    private int exporterCode;
     @Basic(optional = false)
     @Column(name = "phone")
     private String phone;
@@ -76,6 +72,8 @@ public class Clients implements Serializable {
     private Date updatedDate;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "clientId")
     private List<RemittancesCaffee> remittancesCaffeeList;
+    @Column(name = "exporter_code")
+    private String exporterCode;
 
     public Clients() {
     }
@@ -84,11 +82,10 @@ public class Clients implements Serializable {
         this.id = id;
     }
 
-    public Clients(Integer id, String businessName, String emails, int exporterCode, String phone, String cityLocation, Date createdDate, Date updatedDate) {
+    public Clients(Integer id, String businessName, String emails, String exporterCode, String phone, String cityLocation, Date createdDate, Date updatedDate) {
         this.id = id;
         this.businessName = businessName;
         this.emails = emails;
-        this.exporterCode = exporterCode;
         this.phone = phone;
         this.cityLocation = cityLocation;
         this.createdDate = createdDate;
@@ -127,11 +124,11 @@ public class Clients implements Serializable {
         this.contactName = contactName;
     }
 
-    public int getExporterCode() {
+    public String getExporterCode() {
         return exporterCode;
     }
 
-    public void setExporterCode(int exporterCode) {
+    public void setExporterCode(String exporterCode) {
         this.exporterCode = exporterCode;
     }
 

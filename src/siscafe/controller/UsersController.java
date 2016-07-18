@@ -57,6 +57,7 @@ public class UsersController implements ActionListener,ListSelectionListener{
     private void login() {
         String username = this.loginView.jTextField1.getText();
         String password = HashSecurityGenerator.MD5(this.loginView.jPasswordField1.getText());
+        System.out.println(password);
         userLogin = usersJpaController.findUsersByAccess(username, password);
         if(userLogin != null) {
             this.miFrontend.initPermitsByProfile(userLogin);

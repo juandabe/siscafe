@@ -40,6 +40,8 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "PackingCaffee.findByDateCreated", query = "SELECT p FROM PackingCaffee p WHERE p.dateCreated = :dateCreated"),
     @NamedQuery(name = "PackingCaffee.findByDateUpdated", query = "SELECT p FROM PackingCaffee p WHERE p.dateUpdated = :dateUpdated")})
 public class PackingCaffee implements Serializable {
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "packingCafeeId")
+    private List<RemittancesCaffee> remittancesCaffeeList;
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -62,8 +64,6 @@ public class PackingCaffee implements Serializable {
     @Column(name = "date_updated")
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateUpdated;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "packingCafeeId")
-    private List<RemittancesCaffee> remittancesCaffeeList;
 
     public PackingCaffee() {
     }
@@ -128,15 +128,6 @@ public class PackingCaffee implements Serializable {
         this.dateUpdated = dateUpdated;
     }
 
-    @XmlTransient
-    public List<RemittancesCaffee> getRemittancesCaffeeList() {
-        return remittancesCaffeeList;
-    }
-
-    public void setRemittancesCaffeeList(List<RemittancesCaffee> remittancesCaffeeList) {
-        this.remittancesCaffeeList = remittancesCaffeeList;
-    }
-
     @Override
     public int hashCode() {
         int hash = 0;
@@ -160,6 +151,15 @@ public class PackingCaffee implements Serializable {
     @Override
     public String toString() {
         return name;
+    }
+
+    @XmlTransient
+    public List<RemittancesCaffee> getRemittancesCaffeeList() {
+        return remittancesCaffeeList;
+    }
+
+    public void setRemittancesCaffeeList(List<RemittancesCaffee> remittancesCaffeeList) {
+        this.remittancesCaffeeList = remittancesCaffeeList;
     }
     
 }

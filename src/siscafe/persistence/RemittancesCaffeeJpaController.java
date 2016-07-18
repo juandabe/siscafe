@@ -16,6 +16,7 @@ import javax.persistence.criteria.Root;
 import siscafe.model.PackingCaffee;
 import siscafe.model.MarkCaffee;
 import siscafe.model.CitySource;
+import siscafe.model.Clients;
 import siscafe.model.RemittancesCaffee;
 import siscafe.model.Shippers;
 import siscafe.model.SlotStore;
@@ -301,6 +302,51 @@ public class RemittancesCaffeeJpaController implements Serializable {
     public List<RemittancesCaffee> findRemittancesCaffeeInProcessWieght() {
         EntityManager em = getEntityManager();
         Query query = em.createQuery("SELECT r FROM RemittancesCaffee r  WHERE r.statusOperation=2 and r.isActive=true");
+        try {
+            return (List<RemittancesCaffee>) query.getResultList();
+        }
+        catch(Exception e) {
+            return null;
+        }
+    }
+    
+    public List<RemittancesCaffee> findRemittancesCaffeeOrdered() {
+        EntityManager em = getEntityManager();
+        Query query = em.createQuery("SELECT r FROM RemittancesCaffee r  WHERE r.statusOperation=4 and r.isActive=true");
+        try {
+            return (List<RemittancesCaffee>) query.getResultList();
+        }
+        catch(Exception e) {
+            return null;
+        }
+    }
+    
+    public List<RemittancesCaffee> findRemittancesCaffeeProcessPckaging() {
+        EntityManager em = getEntityManager();
+        Query query = em.createQuery("SELECT r FROM RemittancesCaffee r  WHERE r.statusOperation=5 and r.isActive=true");
+        try {
+            return (List<RemittancesCaffee>) query.getResultList();
+        }
+        catch(Exception e) {
+            return null;
+        }
+    }
+    
+    public List<RemittancesCaffee> findRemittancesCaffeeByExporter(Clients client) {
+        EntityManager em = getEntityManager();
+        Query query = em.createQuery("SELECT r FROM RemittancesCaffee r  WHERE r.clientId=:clientId and r.statusOperation=3 and r.isActive=true");
+        query.setParameter("clientId", client);
+        try {
+            return (List<RemittancesCaffee>) query.getResultList();
+        }
+        catch(Exception e) {
+            return null;
+        }
+    }
+
+    public List<RemittancesCaffee> findRemittancesCaffeeByConsultGeneral() {
+        EntityManager em = getEntityManager();
+        Query query = em.createQuery("SELECT r FROM RemittancesCaffee r");
         try {
             return (List<RemittancesCaffee>) query.getResultList();
         }

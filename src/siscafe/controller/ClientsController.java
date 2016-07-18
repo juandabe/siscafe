@@ -82,7 +82,7 @@ public class ClientsController  implements ActionListener, ListSelectionListener
         this.clients.setBusinessName(this.clientView.jTextField3.getText());
         this.clients.setEmails(this.clientView.jTextField4.getText());
         this.clients.setPhone(this.clientView.jTextField7.getText());
-        this.clients.setExporterCode(Integer.parseInt(this.clientView.jTextField5.getText()));
+        this.clients.setExporterCode(this.clientView.jTextField5.getText());
         this.clients.setCityLocation(this.clientView.jComboBox1.getSelectedItem().toString());
         this.clientsJpaController.create(clients);
         JOptionPane.showInternalMessageDialog(clientView, "Registro creado", 
@@ -97,7 +97,7 @@ public class ClientsController  implements ActionListener, ListSelectionListener
         this.clientsSelected.setBusinessName(clientsSelected.getBusinessName());
         this.clientsSelected.setEmails(this.clientView.jTextField4.getText());
         this.clientsSelected.setPhone(this.clientView.jTextField7.getText());
-        this.clientsSelected.setExporterCode(Integer.parseInt(this.clientView.jTextField5.getText()));
+        this.clientsSelected.setExporterCode(this.clientView.jTextField5.getText());
         this.clientsSelected.setCityLocation(this.clientView.jComboBox1.getSelectedItem().toString());
         try {
             this.clientsJpaController.edit(clientsSelected);

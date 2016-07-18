@@ -31,6 +31,7 @@ public class RemittancesCaffeeView extends javax.swing.JInternalFrame {
         jButton3 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
         jButton10 = new javax.swing.JButton();
+        jButton6 = new javax.swing.JButton();
         jSplitPane1 = new javax.swing.JSplitPane();
         jTabbedPane3 = new javax.swing.JTabbedPane();
         jPanel2 = new javax.swing.JPanel();
@@ -113,6 +114,13 @@ public class RemittancesCaffeeView extends javax.swing.JInternalFrame {
         jButton10.setName("print"); // NOI18N
         jButton10.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar1.add(jButton10);
+
+        jButton6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/siscafe/images/printer-icon.png"))); // NOI18N
+        jButton6.setFocusable(false);
+        jButton6.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton6.setName("dailydownloadcaffee"); // NOI18N
+        jButton6.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(jButton6);
 
         jSplitPane1.setDividerLocation(150);
 
@@ -350,6 +358,7 @@ public class RemittancesCaffeeView extends javax.swing.JInternalFrame {
     public javax.swing.JButton jButton3;
     public javax.swing.JButton jButton4;
     public javax.swing.JButton jButton5;
+    public javax.swing.JButton jButton6;
     public javax.swing.JButton jButton9;
     public javax.swing.JComboBox<String> jComboBox1;
     public javax.swing.JComboBox jComboBox2;

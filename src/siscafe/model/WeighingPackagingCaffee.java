@@ -7,7 +7,9 @@ package siscafe.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -17,10 +19,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -36,13 +40,20 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "WeighingPackagingCaffee.findByQuantityBagPallet", query = "SELECT w FROM WeighingPackagingCaffee w WHERE w.quantityBagPallet = :quantityBagPallet"),
     @NamedQuery(name = "WeighingPackagingCaffee.findByWeighingDate", query = "SELECT w FROM WeighingPackagingCaffee w WHERE w.weighingDate = :weighingDate")})
 public class WeighingPackagingCaffee implements Serializable {
+    @Basic(optional = false)
+    @Column(name = "seq_weight_pallet")
+    private int seqWeightPallet;
+    @Basic(optional = false)
+    @Column(name = "is_fraction")
+    private boolean isFraction;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "weighingPackagingCaffeeId")
+    private List<FractionPallet> fractionPalletList;
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-    @Basic(optional = false)
     @Column(name = "weight_pallet")
     private double weightPallet;
     @Basic(optional = false)
@@ -68,6 +79,14 @@ public class WeighingPackagingCaffee implements Serializable {
         this.weightPallet = weightPallet;
         this.quantityBagPallet = quantityBagPallet;
         this.weighingDate = weighingDate;
+    }
+    
+    public Integer getSeqWeightPallet() {
+        return seqWeightPallet;
+    }
+
+    public void setSeqWeightPallet(Integer seqWeightPallet) {
+        this.seqWeightPallet = seqWeightPallet;
     }
 
     public Integer getId() {
@@ -133,6 +152,27 @@ public class WeighingPackagingCaffee implements Serializable {
     @Override
     public String toString() {
         return "siscafe.model.WeighingPackagingCaffee[ id=" + id + " ]";
+    }
+
+    public boolean getIsFraction() {
+        return isFraction;
+    }
+
+    public void setIsFraction(boolean isFraction) {
+        this.isFraction = isFraction;
+    }
+
+    @XmlTransient
+    public List<FractionPallet> getFractionPalletList() {
+        return fractionPalletList;
+    }
+
+    public void setFractionPalletList(List<FractionPallet> fractionPalletList) {
+        this.fractionPalletList = fractionPalletList;
+    }
+
+    public void setSeqWeightPallet(int seqWeightPallet) {
+        this.seqWeightPallet = seqWeightPallet;
     }
     
 }

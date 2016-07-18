@@ -52,7 +52,17 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "RemittancesCaffee.findByIsActive", query = "SELECT r FROM RemittancesCaffee r WHERE r.isActive = :isActive"),
     @NamedQuery(name = "RemittancesCaffee.findByGuideId", query = "SELECT r FROM RemittancesCaffee r WHERE r.guideId = :guideId")})
 public class RemittancesCaffee implements Serializable {
-    private static final long serialVersionUID = 1L;
+    @Column(name = "tare_download")
+    private Double tareDownload;
+    @Column(name = "tare_packaging")
+    private Double tarePackaging;
+    @Column(name = "total_tare")
+    private Integer totalTare;
+    @OneToMany(mappedBy = "remittancesCaffeeId")
+    private List<ContainerFilling> containerFillingList;
+    @JoinColumn(name = "packaging_caffee_id", referencedColumnName = "id")
+    @ManyToOne(optional = false)
+    private PackagingCaffee packagingCaffeeId;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
@@ -72,8 +82,8 @@ public class RemittancesCaffee implements Serializable {
     private Double totalWeightNetNominal;
     @Column(name = "total_weight_net_real")
     private Double totalWeightNetReal;
-    @Column(name = "total_tare")
-    private Double totalTare;
+    @Column(name = "weight_pallet_packaging_total")
+    private Double weightPalletPackagingTotal;
     @Column(name = "quantity_in_pallet_caffee")
     private Integer  quantityInPalletCaffee;
     @Column(name = "quantity_out_pallet_caffee")
@@ -124,12 +134,6 @@ public class RemittancesCaffee implements Serializable {
     @JoinColumn(name = "client_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Clients clientId;
-    @JoinColumn(name = "port_operators_id", referencedColumnName = "id")
-    @ManyToOne
-    private PortOperators portOperatorsId;
-    @JoinColumn(name = "motor_ships_id", referencedColumnName = "id")
-    @ManyToOne
-    private MotorShips motorShipsId;
     @JoinColumn(name = "units_cafee_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private UnitsCaffee unitsCafeeId;
@@ -159,8 +163,6 @@ public class RemittancesCaffee implements Serializable {
     private Users staffDriverId;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "remittancesCafeeId")
     private List<ReturnsCaffees> returnsCaffeesList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "remittancesCafeeId")
-    private List<PackagingCaffee> packagingCaffeeList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "remittancesCaffeeId")
     private List<RelatedServices> relatedServicesList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "remittancesCafeeId")
@@ -191,6 +193,30 @@ public class RemittancesCaffee implements Serializable {
         this.updatedDated = updatedDated;
         this.isActive = isActive;
         this.guideId = guideId;
+    }
+
+    public Double getTareDownload() {
+        return tareDownload;
+    }
+
+    public Double getWeightPalletPackagingTotal() {
+        return weightPalletPackagingTotal;
+    }
+
+    public void setWeightPalletPackagingTotal(Double weightPalletPackagingTotal) {
+        this.weightPalletPackagingTotal = weightPalletPackagingTotal;
+    }
+
+    public void setTareDownload(Double tareDownload) {
+        this.tareDownload = tareDownload;
+    }
+
+    public Double getTarePackaging() {
+        return tarePackaging;
+    }
+
+    public void setTarePackaging(Double tarePackaging) {
+        this.tarePackaging = tarePackaging;
     }
 
     public String getDetailsWeight() {
@@ -281,11 +307,11 @@ public class RemittancesCaffee implements Serializable {
         this.totalWeightNetReal = totalWeightNetReal;
     }
 
-    public Double getTotalTare() {
+    public int getTotalTare() {
         return totalTare;
     }
 
-    public void setTotalTare(Double totalTare) {
+    public void setTotalTare(int totalTare) {
         this.totalTare = totalTare;
     }
 
@@ -395,22 +421,6 @@ public class RemittancesCaffee implements Serializable {
         this.clientId = clientId;
     }
 
-    public PortOperators getPortOperatorsId() {
-        return portOperatorsId;
-    }
-
-    public void setPortOperatorsId(PortOperators portOperatorsId) {
-        this.portOperatorsId = portOperatorsId;
-    }
-
-    public MotorShips getMotorShipsId() {
-        return motorShipsId;
-    }
-
-    public void setMotorShipsId(MotorShips motorShipsId) {
-        this.motorShipsId = motorShipsId;
-    }
-
     public UnitsCaffee getUnitsCafeeId() {
         return unitsCafeeId;
     }
@@ -492,14 +502,14 @@ public class RemittancesCaffee implements Serializable {
         this.returnsCaffeesList = returnsCaffeesList;
     }
 
-    @XmlTransient
+    /*@XmlTransient
     public List<PackagingCaffee> getPackagingCaffeeList() {
         return packagingCaffeeList;
     }
 
     public void setPackagingCaffeeList(List<PackagingCaffee> packagingCaffeeList) {
         this.packagingCaffeeList = packagingCaffeeList;
-    }
+    }*/
 
     @XmlTransient
     public List<RelatedServices> getRelatedServicesList() {
@@ -552,5 +562,25 @@ public class RemittancesCaffee implements Serializable {
     public String toString() {
         return "siscafe.model.RemittancesCaffee[ id=" + id + " ]";
     }
-    
+
+    public PackagingCaffee getPackagingCaffeeId() {
+        return packagingCaffeeId;
+    }
+
+    public void setPackagingCaffeeId(PackagingCaffee packagingCaffeeId) {
+        this.packagingCaffeeId = packagingCaffeeId;
+    }
+
+    public void setTotalTare(Integer totalTare) {
+        this.totalTare = totalTare;
+    }
+
+    @XmlTransient
+    public List<ContainerFilling> getContainerFillingList() {
+        return containerFillingList;
+    }
+
+    public void setContainerFillingList(List<ContainerFilling> containerFillingList) {
+        this.containerFillingList = containerFillingList;
+    }
 }

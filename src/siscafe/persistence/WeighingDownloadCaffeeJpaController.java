@@ -145,7 +145,6 @@ public class WeighingDownloadCaffeeJpaController implements Serializable {
         Query query = em.createQuery("SELECT COUNT(wrc.id) FROM WeighingDownloadCaffee wrc WHERE wrc.remittancesCaffeeId.id=:remittancesCaffeeId");
         query.setParameter("remittancesCaffeeId", remittancesCaffeeId);
         try {
-            System.out.println("data: "+query.getSingleResult());
             return query.getSingleResult();
         }
         catch(Exception e) {
@@ -160,6 +159,19 @@ public class WeighingDownloadCaffeeJpaController implements Serializable {
         query.setParameter("remittancesCaffeeId", remittancesCaffeeId);
         try {
             return query.getSingleResult();
+        }
+        catch(Exception e) {
+            return 0;
+        }
+    }
+    
+    public double countWeightByRemettencesCaffee(int remittancesCaffeeId) {
+        
+        EntityManager em = getEntityManager();
+        Query query = em.createQuery("SELECT SUM(wrc.weightPallet) FROM WeighingDownloadCaffee wrc WHERE wrc.remittancesCaffeeId.id=:remittancesCaffeeId");
+        query.setParameter("remittancesCaffeeId", remittancesCaffeeId);
+        try {
+            return (double) query.getSingleResult();
         }
         catch(Exception e) {
             return 0;

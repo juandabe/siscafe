@@ -39,6 +39,8 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "ShippingLines.findByCreatedDate", query = "SELECT s FROM ShippingLines s WHERE s.createdDate = :createdDate"),
     @NamedQuery(name = "ShippingLines.findByUpdatedDate", query = "SELECT s FROM ShippingLines s WHERE s.updatedDate = :updatedDate")})
 public class ShippingLines implements Serializable {
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "shippingLinesId")
+    private List<PackagingCaffee> packagingCaffeeoldList;
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -58,8 +60,6 @@ public class ShippingLines implements Serializable {
     @Column(name = "updated_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedDate;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "linesId")
-    private List<MotorShips> motorShipsList;
 
     public ShippingLines() {
     }
@@ -115,15 +115,6 @@ public class ShippingLines implements Serializable {
         this.updatedDate = updatedDate;
     }
 
-    @XmlTransient
-    public List<MotorShips> getMotorShipsList() {
-        return motorShipsList;
-    }
-
-    public void setMotorShipsList(List<MotorShips> motorShipsList) {
-        this.motorShipsList = motorShipsList;
-    }
-
     @Override
     public int hashCode() {
         int hash = 0;
@@ -146,7 +137,16 @@ public class ShippingLines implements Serializable {
 
     @Override
     public String toString() {
-        return "siscafe.model.ShippingLines[ id=" + id + " ]";
+        return businessName;
+    }
+
+    @XmlTransient
+    public List<PackagingCaffee> getPackagingCaffeeoldList() {
+        return packagingCaffeeoldList;
+    }
+
+    public void setPackagingCaffeeoldList(List<PackagingCaffee> packagingCaffeeoldList) {
+        this.packagingCaffeeoldList = packagingCaffeeoldList;
     }
     
 }

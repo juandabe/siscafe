@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -30,50 +31,42 @@ import javax.xml.bind.annotation.XmlTransient;
  * @author Administrador
  */
 @Entity
-@Table(name = "motor_ships")
+@Table(name = "fraction_pallet")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "MotorShips.findAll", query = "SELECT m FROM MotorShips m"),
-    @NamedQuery(name = "MotorShips.findById", query = "SELECT m FROM MotorShips m WHERE m.id = :id"),
-    @NamedQuery(name = "MotorShips.findByName", query = "SELECT m FROM MotorShips m WHERE m.name = :name"),
-    @NamedQuery(name = "MotorShips.findByCreatedDate", query = "SELECT m FROM MotorShips m WHERE m.createdDate = :createdDate"),
-    @NamedQuery(name = "MotorShips.findByUpdatedDate", query = "SELECT m FROM MotorShips m WHERE m.updatedDate = :updatedDate")})
-public class MotorShips implements Serializable {
+    @NamedQuery(name = "FractionPallet.findAll", query = "SELECT f FROM FractionPallet f"),
+    @NamedQuery(name = "FractionPallet.findById", query = "SELECT f FROM FractionPallet f WHERE f.id = :id"),
+    @NamedQuery(name = "FractionPallet.findByQuantityBags", query = "SELECT f FROM FractionPallet f WHERE f.quantityBags = :quantityBags"),
+    @NamedQuery(name = "FractionPallet.findByCreatedDate", query = "SELECT f FROM FractionPallet f WHERE f.createdDate = :createdDate")})
+public class FractionPallet implements Serializable {
+    @OneToMany(mappedBy = "fractionPalletId")
+    private List<ContainerFilling> containerFillingList;
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-    @Basic(optional = false)
-    @Column(name = "name")
-    private String name;
+    @Column(name = "quantity_bags")
+    private Integer quantityBags;
     @Basic(optional = false)
     @Column(name = "created_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
-    @Basic(optional = false)
-    @Column(name = "updated_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updatedDate;
-    @OneToMany(mappedBy = "motorShipsId")
-    private List<RemittancesCaffee> remittancesCaffeeList;
-    @JoinColumn(name = "lines_id", referencedColumnName = "id")
+    @JoinColumn(name = "weighing_packaging_caffee_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
-    private ShippingLines linesId;
+    private WeighingPackagingCaffee weighingPackagingCaffeeId;
 
-    public MotorShips() {
+    public FractionPallet() {
     }
 
-    public MotorShips(Integer id) {
+    public FractionPallet(Integer id) {
         this.id = id;
     }
 
-    public MotorShips(Integer id, String name, Date createdDate, Date updatedDate) {
+    public FractionPallet(Integer id, Date createdDate) {
         this.id = id;
-        this.name = name;
         this.createdDate = createdDate;
-        this.updatedDate = updatedDate;
     }
 
     public Integer getId() {
@@ -84,12 +77,12 @@ public class MotorShips implements Serializable {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public Integer getQuantityBags() {
+        return quantityBags;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setQuantityBags(Integer quantityBags) {
+        this.quantityBags = quantityBags;
     }
 
     public Date getCreatedDate() {
@@ -100,29 +93,12 @@ public class MotorShips implements Serializable {
         this.createdDate = createdDate;
     }
 
-    public Date getUpdatedDate() {
-        return updatedDate;
+    public WeighingPackagingCaffee getWeighingPackagingCaffeeId() {
+        return weighingPackagingCaffeeId;
     }
 
-    public void setUpdatedDate(Date updatedDate) {
-        this.updatedDate = updatedDate;
-    }
-
-    @XmlTransient
-    public List<RemittancesCaffee> getRemittancesCaffeeList() {
-        return remittancesCaffeeList;
-    }
-
-    public void setRemittancesCaffeeList(List<RemittancesCaffee> remittancesCaffeeList) {
-        this.remittancesCaffeeList = remittancesCaffeeList;
-    }
-
-    public ShippingLines getLinesId() {
-        return linesId;
-    }
-
-    public void setLinesId(ShippingLines linesId) {
-        this.linesId = linesId;
+    public void setWeighingPackagingCaffeeId(WeighingPackagingCaffee weighingPackagingCaffeeId) {
+        this.weighingPackagingCaffeeId = weighingPackagingCaffeeId;
     }
 
     @Override
@@ -135,10 +111,10 @@ public class MotorShips implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof MotorShips)) {
+        if (!(object instanceof FractionPallet)) {
             return false;
         }
-        MotorShips other = (MotorShips) object;
+        FractionPallet other = (FractionPallet) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -147,7 +123,16 @@ public class MotorShips implements Serializable {
 
     @Override
     public String toString() {
-        return "siscafe.model.MotorShips[ id=" + id + " ]";
+        return "siscafe.model.temp.FractionPallet[ id=" + id + " ]";
+    }
+
+    @XmlTransient
+    public List<ContainerFilling> getContainerFillingList() {
+        return containerFillingList;
+    }
+
+    public void setContainerFillingList(List<ContainerFilling> containerFillingList) {
+        this.containerFillingList = containerFillingList;
     }
     
 }

@@ -19,7 +19,6 @@
     <class>siscafe.model.Clients</class>
     <class>siscafe.model.UnitsCaffee</class>
     <class>siscafe.model.TypeContainer</class>
-    <class>siscafe.model.PackagingCaffee</class>
     <class>siscafe.model.MotorShips</class>
     <class>siscafe.model.Departaments</class>
     <class>siscafe.model.PackingCaffee</class>
@@ -35,6 +34,10 @@
     <class>siscafe.model.Profiles</class>
     <class>siscafe.model.ShippingLines</class>
     <class>siscafe.models.RemittancesCaffee</class>
+    <class>siscafe.model.FractionPallet</class>
+    <class>siscafe.model.NavyAgent</class>
+    <class>siscafe.model.PackagingCaffee</class>
+    <class>siscafe.model.ContainerFilling</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://192.168.35.213:3306/schema_siscafe?zeroDateTimeBehavior=convertToNull"/>
       <property name="javax.persistence.jdbc.user" value="sop_user"/>

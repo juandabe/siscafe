@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -38,6 +39,8 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "PortOperators.findByCreatedDate", query = "SELECT p FROM PortOperators p WHERE p.createdDate = :createdDate"),
     @NamedQuery(name = "PortOperators.findByUpdatedDate", query = "SELECT p FROM PortOperators p WHERE p.updatedDate = :updatedDate")})
 public class PortOperators implements Serializable {
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "portOperatorsId")
+    private List<PackagingCaffee> packagingCaffeeList;
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -58,9 +61,7 @@ public class PortOperators implements Serializable {
     @Column(name = "updated_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedDate;
-    @OneToMany(mappedBy = "portOperatorsId")
-    private List<RemittancesCaffee> remittancesCaffeeList;
-
+    
     public PortOperators() {
     }
 
@@ -115,16 +116,7 @@ public class PortOperators implements Serializable {
     public void setUpdatedDate(Date updatedDate) {
         this.updatedDate = updatedDate;
     }
-
-    @XmlTransient
-    public List<RemittancesCaffee> getRemittancesCaffeeList() {
-        return remittancesCaffeeList;
-    }
-
-    public void setRemittancesCaffeeList(List<RemittancesCaffee> remittancesCaffeeList) {
-        this.remittancesCaffeeList = remittancesCaffeeList;
-    }
-
+    
     @Override
     public int hashCode() {
         int hash = 0;
@@ -147,7 +139,16 @@ public class PortOperators implements Serializable {
 
     @Override
     public String toString() {
-        return "siscafe.model.PortOperators[ id=" + id + " ]";
+        return name;
+    }
+
+    @XmlTransient
+    public List<PackagingCaffee> getPackagingCaffeeList() {
+        return packagingCaffeeList;
+    }
+
+    public void setPackagingCaffeeList(List<PackagingCaffee> packagingCaffeeList) {
+        this.packagingCaffeeList = packagingCaffeeList;
     }
     
 }

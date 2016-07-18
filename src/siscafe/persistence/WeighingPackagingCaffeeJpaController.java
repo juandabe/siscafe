@@ -13,6 +13,7 @@ import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import siscafe.model.RemittancesCaffee;
 import siscafe.model.WeighingPackagingCaffee;
 import siscafe.persistence.exceptions.NonexistentEntityException;
 
@@ -119,6 +120,57 @@ public class WeighingPackagingCaffeeJpaController implements Serializable {
             return em.find(WeighingPackagingCaffee.class, id);
         } finally {
             em.close();
+        }
+    }
+    
+    public Object countPalletByRemettencesCaffee(int remittancesCaffeeId) {
+        
+        EntityManager em = getEntityManager();
+        Query query = em.createQuery("SELECT COUNT(wrc.id) FROM WeighingPackagingCaffee wrc WHERE wrc.remittancesCafeeId.id=:remittancesCaffeeId");
+        query.setParameter("remittancesCaffeeId", remittancesCaffeeId);
+        try {
+            return query.getSingleResult();
+        }
+        catch(Exception e) {
+            return 0;
+        }
+    }
+    
+    public double countWeightByRemettencesCaffee(int remittancesCaffeeId) {
+        
+        EntityManager em = getEntityManager();
+        Query query = em.createQuery("SELECT SUM(wrc.weightPallet) FROM WeighingPackagingCaffee wrc WHERE wrc.remittancesCafeeId.id=:remittancesCaffeeId");
+        query.setParameter("remittancesCaffeeId", remittancesCaffeeId);
+        try {
+            return (double) query.getSingleResult();
+        }
+        catch(Exception e) {
+            return 0;
+        }
+    }
+    
+    public int countBagsByRemettencesCaffee(int remittancesCaffeeId) {
+        
+        EntityManager em = getEntityManager();
+        Query query = em.createQuery("SELECT SUM(wrc.quantityBagPallet) FROM WeighingPackagingCaffee wrc WHERE wrc.remittancesCafeeId.id=:remittancesCaffeeId");
+        query.setParameter("remittancesCaffeeId", remittancesCaffeeId);
+        try {
+            return (int) query.getSingleResult();
+        }
+        catch(Exception e) {
+            return 0;
+        }
+    }
+    
+    public List<WeighingPackagingCaffee> findWeighingPackagingCaffeeEntitiesByRemettances(RemittancesCaffee remittancesCaffee) {
+        EntityManager em = getEntityManager();
+        Query query = em.createQuery("SELECT wrc FROM WeighingPackagingCaffee wrc where wrc.remittancesCafeeId=:remittancesCaffee");
+        query.setParameter("remittancesCaffee", remittancesCaffee);
+        try {
+            return (List<WeighingPackagingCaffee>) query.getResultList();
+        }
+        catch(Exception e) {
+            return null;
         }
     }
 

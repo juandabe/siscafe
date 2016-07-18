@@ -6,17 +6,15 @@
 package siscafe.persistence;
 
 import java.io.Serializable;
+import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import siscafe.model.RemittancesCaffee;
-import java.util.ArrayList;
-import java.util.List;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import siscafe.model.PackingCaffee;
-import siscafe.persistence.exceptions.IllegalOrphanException;
+import siscafe.model.RemittancesCaffee;
 import siscafe.persistence.exceptions.NonexistentEntityException;
 
 /**
@@ -35,29 +33,11 @@ public class PackingCaffeeJpaController implements Serializable {
     }
 
     public void create(PackingCaffee packingCaffee) {
-        if (packingCaffee.getRemittancesCaffeeList() == null) {
-            packingCaffee.setRemittancesCaffeeList(new ArrayList<RemittancesCaffee>());
-        }
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            List<RemittancesCaffee> attachedRemittancesCaffeeList = new ArrayList<RemittancesCaffee>();
-            for (RemittancesCaffee remittancesCaffeeListRemittancesCaffeeToAttach : packingCaffee.getRemittancesCaffeeList()) {
-                remittancesCaffeeListRemittancesCaffeeToAttach = em.getReference(remittancesCaffeeListRemittancesCaffeeToAttach.getClass(), remittancesCaffeeListRemittancesCaffeeToAttach.getId());
-                attachedRemittancesCaffeeList.add(remittancesCaffeeListRemittancesCaffeeToAttach);
-            }
-            packingCaffee.setRemittancesCaffeeList(attachedRemittancesCaffeeList);
             em.persist(packingCaffee);
-            for (RemittancesCaffee remittancesCaffeeListRemittancesCaffee : packingCaffee.getRemittancesCaffeeList()) {
-                PackingCaffee oldPackingCafeeIdOfRemittancesCaffeeListRemittancesCaffee = remittancesCaffeeListRemittancesCaffee.getPackingCafeeId();
-                remittancesCaffeeListRemittancesCaffee.setPackingCafeeId(packingCaffee);
-                remittancesCaffeeListRemittancesCaffee = em.merge(remittancesCaffeeListRemittancesCaffee);
-                if (oldPackingCafeeIdOfRemittancesCaffeeListRemittancesCaffee != null) {
-                    oldPackingCafeeIdOfRemittancesCaffeeListRemittancesCaffee.getRemittancesCaffeeList().remove(remittancesCaffeeListRemittancesCaffee);
-                    oldPackingCafeeIdOfRemittancesCaffeeListRemittancesCaffee = em.merge(oldPackingCafeeIdOfRemittancesCaffeeListRemittancesCaffee);
-                }
-            }
             em.getTransaction().commit();
         } finally {
             if (em != null) {
@@ -66,45 +46,12 @@ public class PackingCaffeeJpaController implements Serializable {
         }
     }
 
-    public void edit(PackingCaffee packingCaffee) throws IllegalOrphanException, NonexistentEntityException, Exception {
+    public void edit(PackingCaffee packingCaffee) throws NonexistentEntityException, Exception {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            PackingCaffee persistentPackingCaffee = em.find(PackingCaffee.class, packingCaffee.getId());
-            List<RemittancesCaffee> remittancesCaffeeListOld = persistentPackingCaffee.getRemittancesCaffeeList();
-            List<RemittancesCaffee> remittancesCaffeeListNew = packingCaffee.getRemittancesCaffeeList();
-            List<String> illegalOrphanMessages = null;
-            for (RemittancesCaffee remittancesCaffeeListOldRemittancesCaffee : remittancesCaffeeListOld) {
-                if (!remittancesCaffeeListNew.contains(remittancesCaffeeListOldRemittancesCaffee)) {
-                    if (illegalOrphanMessages == null) {
-                        illegalOrphanMessages = new ArrayList<String>();
-                    }
-                    illegalOrphanMessages.add("You must retain RemittancesCaffee " + remittancesCaffeeListOldRemittancesCaffee + " since its packingCafeeId field is not nullable.");
-                }
-            }
-            if (illegalOrphanMessages != null) {
-                throw new IllegalOrphanException(illegalOrphanMessages);
-            }
-            List<RemittancesCaffee> attachedRemittancesCaffeeListNew = new ArrayList<RemittancesCaffee>();
-            for (RemittancesCaffee remittancesCaffeeListNewRemittancesCaffeeToAttach : remittancesCaffeeListNew) {
-                remittancesCaffeeListNewRemittancesCaffeeToAttach = em.getReference(remittancesCaffeeListNewRemittancesCaffeeToAttach.getClass(), remittancesCaffeeListNewRemittancesCaffeeToAttach.getId());
-                attachedRemittancesCaffeeListNew.add(remittancesCaffeeListNewRemittancesCaffeeToAttach);
-            }
-            remittancesCaffeeListNew = attachedRemittancesCaffeeListNew;
-            packingCaffee.setRemittancesCaffeeList(remittancesCaffeeListNew);
             packingCaffee = em.merge(packingCaffee);
-            for (RemittancesCaffee remittancesCaffeeListNewRemittancesCaffee : remittancesCaffeeListNew) {
-                if (!remittancesCaffeeListOld.contains(remittancesCaffeeListNewRemittancesCaffee)) {
-                    PackingCaffee oldPackingCafeeIdOfRemittancesCaffeeListNewRemittancesCaffee = remittancesCaffeeListNewRemittancesCaffee.getPackingCafeeId();
-                    remittancesCaffeeListNewRemittancesCaffee.setPackingCafeeId(packingCaffee);
-                    remittancesCaffeeListNewRemittancesCaffee = em.merge(remittancesCaffeeListNewRemittancesCaffee);
-                    if (oldPackingCafeeIdOfRemittancesCaffeeListNewRemittancesCaffee != null && !oldPackingCafeeIdOfRemittancesCaffeeListNewRemittancesCaffee.equals(packingCaffee)) {
-                        oldPackingCafeeIdOfRemittancesCaffeeListNewRemittancesCaffee.getRemittancesCaffeeList().remove(remittancesCaffeeListNewRemittancesCaffee);
-                        oldPackingCafeeIdOfRemittancesCaffeeListNewRemittancesCaffee = em.merge(oldPackingCafeeIdOfRemittancesCaffeeListNewRemittancesCaffee);
-                    }
-                }
-            }
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
@@ -122,7 +69,7 @@ public class PackingCaffeeJpaController implements Serializable {
         }
     }
 
-    public void destroy(Integer id) throws IllegalOrphanException, NonexistentEntityException {
+    public void destroy(Integer id) throws NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -133,17 +80,6 @@ public class PackingCaffeeJpaController implements Serializable {
                 packingCaffee.getId();
             } catch (EntityNotFoundException enfe) {
                 throw new NonexistentEntityException("The packingCaffee with id " + id + " no longer exists.", enfe);
-            }
-            List<String> illegalOrphanMessages = null;
-            List<RemittancesCaffee> remittancesCaffeeListOrphanCheck = packingCaffee.getRemittancesCaffeeList();
-            for (RemittancesCaffee remittancesCaffeeListOrphanCheckRemittancesCaffee : remittancesCaffeeListOrphanCheck) {
-                if (illegalOrphanMessages == null) {
-                    illegalOrphanMessages = new ArrayList<String>();
-                }
-                illegalOrphanMessages.add("This PackingCaffee (" + packingCaffee + ") cannot be destroyed since the RemittancesCaffee " + remittancesCaffeeListOrphanCheckRemittancesCaffee + " in its remittancesCaffeeList field has a non-nullable packingCafeeId field.");
-            }
-            if (illegalOrphanMessages != null) {
-                throw new IllegalOrphanException(illegalOrphanMessages);
             }
             em.remove(packingCaffee);
             em.getTransaction().commit();
@@ -177,6 +113,7 @@ public class PackingCaffeeJpaController implements Serializable {
             em.close();
         }
     }
+
 
     public PackingCaffee findPackingCaffee(Integer id) {
         EntityManager em = getEntityManager();
