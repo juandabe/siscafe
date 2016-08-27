@@ -52,14 +52,14 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "RemittancesCaffee.findByIsActive", query = "SELECT r FROM RemittancesCaffee r WHERE r.isActive = :isActive"),
     @NamedQuery(name = "RemittancesCaffee.findByGuideId", query = "SELECT r FROM RemittancesCaffee r WHERE r.guideId = :guideId")})
 public class RemittancesCaffee implements Serializable {
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "remittancesCaffee")
+    private List<DetailPackagingCaffee> detailPackagingCaffeeList;
     @Column(name = "tare_download")
     private Double tareDownload;
     @Column(name = "tare_packaging")
     private Double tarePackaging;
     @Column(name = "total_tare")
     private Integer totalTare;
-    @OneToMany(mappedBy = "remittancesCaffeeId")
-    private List<ContainerFilling> containerFillingList;
     @JoinColumn(name = "packaging_caffee_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private PackagingCaffee packagingCaffeeId;
@@ -576,11 +576,11 @@ public class RemittancesCaffee implements Serializable {
     }
 
     @XmlTransient
-    public List<ContainerFilling> getContainerFillingList() {
-        return containerFillingList;
+    public List<DetailPackagingCaffee> getDetailPackagingCaffeeList() {
+        return detailPackagingCaffeeList;
     }
 
-    public void setContainerFillingList(List<ContainerFilling> containerFillingList) {
-        this.containerFillingList = containerFillingList;
+    public void setDetailPackagingCaffeeList(List<DetailPackagingCaffee> detailPackagingCaffeeList) {
+        this.detailPackagingCaffeeList = detailPackagingCaffeeList;
     }
 }

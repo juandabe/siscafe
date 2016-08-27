@@ -67,13 +67,14 @@ public class Clients implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
     @Basic(optional = false)
+    @Column(name = "exporter_code")
+    private int exporterCode;
+    @Basic(optional = false)
     @Column(name = "updated_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedDate;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "clientId")
     private List<RemittancesCaffee> remittancesCaffeeList;
-    @Column(name = "exporter_code")
-    private String exporterCode;
 
     public Clients() {
     }
@@ -122,14 +123,6 @@ public class Clients implements Serializable {
 
     public void setContactName(String contactName) {
         this.contactName = contactName;
-    }
-
-    public String getExporterCode() {
-        return exporterCode;
-    }
-
-    public void setExporterCode(String exporterCode) {
-        this.exporterCode = exporterCode;
     }
 
     public String getPhone() {
@@ -196,6 +189,15 @@ public class Clients implements Serializable {
     @Override
     public String toString() {
         return businessName;
+    }
+
+    public int getExporterCode() {
+        
+        return exporterCode;
+    }
+
+    public void setExporterCode(int exporterCode) {
+        this.exporterCode = exporterCode;
     }
     
 }

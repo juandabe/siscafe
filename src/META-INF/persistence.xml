@@ -38,6 +38,7 @@
     <class>siscafe.model.NavyAgent</class>
     <class>siscafe.model.PackagingCaffee</class>
     <class>siscafe.model.ContainerFilling</class>
+    <class>siscafe.model.DetailPackagingCaffee</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://192.168.35.213:3306/schema_siscafe?zeroDateTimeBehavior=convertToNull"/>
       <property name="javax.persistence.jdbc.user" value="sop_user"/>

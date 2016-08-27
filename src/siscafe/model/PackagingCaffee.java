@@ -39,6 +39,8 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "PackagingCaffee.findByPackagingType", query = "SELECT p FROM PackagingCaffee p WHERE p.packagingType = :packagingType"),
     @NamedQuery(name = "PackagingCaffee.findByExportStatement", query = "SELECT p FROM PackagingCaffee p WHERE p.exportStatement = :exportStatement")})
 public class PackagingCaffee implements Serializable {
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "packagingCaffee")
+    private List<DetailPackagingCaffee> detailPackagingCaffeeList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "packagingCaffeeId")
     private List<RemittancesCaffee> remittancesCaffeeList;
     @JoinColumn(name = "navy_agent_id", referencedColumnName = "id")
@@ -223,6 +225,15 @@ public class PackagingCaffee implements Serializable {
 
     public void setRemittancesCaffeeList(List<RemittancesCaffee> remittancesCaffeeList) {
         this.remittancesCaffeeList = remittancesCaffeeList;
+    }
+
+    @XmlTransient
+    public List<DetailPackagingCaffee> getDetailPackagingCaffeeList() {
+        return detailPackagingCaffeeList;
+    }
+
+    public void setDetailPackagingCaffeeList(List<DetailPackagingCaffee> detailPackagingCaffeeList) {
+        this.detailPackagingCaffeeList = detailPackagingCaffeeList;
     }
     
 }

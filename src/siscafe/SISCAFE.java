@@ -1,8 +1,6 @@
 
 package siscafe;
 
-import java.util.Iterator;
-import java.util.List;
 import siscafe.util.ScreenSplash;
 
 //import siscafe.view.frontend.Frontend;
@@ -17,7 +15,8 @@ public class SISCAFE {
         //GetContainerList getContainerList = new GetContainerList();
         //getContainerList.setSFecha("20160623");
         //GetContainerListResponse getContainerListResponse = new GetContainerListResponse();
-        //InfoLlenadoCOPC getContainerListResult = getContainerListResponse.getGetContainerListResult();
+        //InfoLlenadoCOPC getContainerListResult = new InfoLlenadoCOPC();
+        //ArrayOfInfoUnidades unidades = getContainerListResult.getUnidades();
         java.awt.EventQueue.invokeLater(new ScreenSplash()::animar);
     }
 }

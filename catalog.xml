@@ -2,5 +2,6 @@
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
     <system systemId="http://www.webservicex.net/CurrencyConvertor.asmx?WSDL" uri="xml-resources/web-service-references/CurrencyConvertor/wsdl/www.webservicex.net/CurrencyConvertor.asmx.wsdl"/>
     <system systemId="http://200.29.233.214:59632/SpbPortal/SociedadPortuariaService.asmx" uri="xml-resources/web-service-references/SociedadPortuariaService/wsdl/200.29.233.214_59632/SpbPortal/SociedadPortuariaService.asmx"/>
+    <system systemId="http://200.29.233.214:59632/SpbPortal/SociedadPortuariaService.asmx?op=GetContainerList" uri="xml-resources/web-service-references/SociedadPortuariaService/wsdl/200.29.233.214_59632/SpbPortal/SociedadPortuariaService.asmx.op_getcontainerlist"/>
     <system systemId="http://200.29.233.214:59632/SpbPortal/SociedadPortuariaService.asmx?WSDL" uri="xml-resources/web-service-references/SociedadPortuariaService/wsdl/200.29.233.214_59632/SpbPortal/SociedadPortuariaService.asmx.wsdl"/>
 </catalog>

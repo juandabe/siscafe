@@ -295,7 +295,6 @@ public class WeighingController implements ActionListener{
     public void initListener() {
         weighingView.jButton3.addActionListener(this);
         weighingView.jButton4.addActionListener(this);
-        weighingView.jMenuItem4.addActionListener(this);
         weighingView.jButton1.addActionListener(this);
         weighingView.jButton2.addActionListener(this);
         initListenerInPendientWeight();
@@ -318,7 +317,7 @@ public class WeighingController implements ActionListener{
                         UnitsCaffee unitsCaffee = remittancesCaffeeProcess.getUnitsCafeeId();
                         //double newWeight = Double.valueOf(weighingView.jLabel1.getText());
                         double newWeight = 1855.0;
-                        double newBagsPallet = newWeight / unitsCaffee.getQuantity();
+                        double newBagsPallet = ((newWeight-70) / unitsCaffee.getQuantity());
                         this.weighingView.jSpinner1.setValue(Math.ceil(newBagsPallet));
                         refreshListWeightingRemettances(remittancesCaffeeProcess, operationType);
                         CitySource citySource = remittancesCaffeeProcess.getCitySourceId();
@@ -352,9 +351,9 @@ public class WeighingController implements ActionListener{
                         weighingView.jTextField1.setText(value);
                         remittancesCaffeeProcess = remittancesCaffeeJpaController.findRemittancesCaffee(remettancesId);
                         UnitsCaffee unitsCaffee = remittancesCaffeeProcess.getUnitsCafeeId();
-                        //double newWeight = Double.valueOf(weighingView.jLabel1.getText());
-                        double newWeight = 1855.0;
-                        double newBagsPallet = newWeight / unitsCaffee.getQuantity();
+                        double newWeight = Double.valueOf(weighingView.jLabel1.getText());
+                        //double newWeight = 1855.0;
+                        double newBagsPallet = ((newWeight-70) / unitsCaffee.getQuantity());
                         this.weighingView.jSpinner1.setValue(Math.ceil(newBagsPallet));
                         refreshListWeightingRemettances(remittancesCaffeeProcess, operationType);
                         CitySource citySource = remittancesCaffeeProcess.getCitySourceId();
@@ -466,7 +465,7 @@ public class WeighingController implements ActionListener{
                 weighingView.jTable3.repaint();
             break;
             case "SALIDA":
-                List <WeighingPackagingCaffee> listWeighingPackagingCaffee = weighingPackagingCaffeeJpaController.findWeighingPackagingCaffeeEntitiesByRemettances(remittancesCaffee);
+                List <WeighingPackagingCaffee> listWeighingPackagingCaffee = weighingPackagingCaffeeJpaController.findWeighingPackagingCaffeeByRemettances(remittancesCaffee.getId());
                 Iterator <WeighingPackagingCaffee> iteratorWeighingPackagingCaffee = listWeighingPackagingCaffee.iterator();
                 int sizeListOrdered = listWeighingPackagingCaffee.size();
                 int indexRowOrdered=0;
@@ -578,6 +577,7 @@ public class WeighingController implements ActionListener{
     }
     
     private void refreshListPendientWieght(String operationType) {
+        SimpleDateFormat dt1 = new SimpleDateFormat("yyyy/MM/dd");
         switch (operationType) {
             case "ENTRADA":
                 List <RemittancesCaffee> listRemittancesCaffee = remittancesCaffeeJpaController.findRemittancesCaffeePendientWeight();
@@ -588,13 +588,13 @@ public class WeighingController implements ActionListener{
                 Object columnNames[] = { "Fecha", "Remesa", "Lote", "Exportador","Sacos Radicados","Sacos In","Motorista","Muestreador"};
                 while(iteratorRemittancesCaffee.hasNext()) {
                     RemittancesCaffee remittance = iteratorRemittancesCaffee.next();
-                    rowDataPendient[indexRow][0] = remittance.getCreatedDate();
+                    rowDataPendient[indexRow][0] = dt1.format(remittance.getCreatedDate());
                     rowDataPendient[indexRow][1] = remittance.getId();
                     rowDataPendient[indexRow][2] = remittance.getLotCaffee();
                     rowDataPendient[indexRow][3] = remittance.getClientId().getBusinessName();
                     rowDataPendient[indexRow][4] = remittance.getQuantityBagRadicatedIn();
-                    rowDataPendient[indexRow][6] = remittance.getQuantityBagInStore();
-                    rowDataPendient[indexRow][5] = remittance.getStaffDriverId().getFirstName();
+                    rowDataPendient[indexRow][6] = remittance.getStaffDriverId().getFirstName();
+                    rowDataPendient[indexRow][5] = remittance.getQuantityBagInStore();
                     rowDataPendient[indexRow][7] = remittance.getStaffSampleId().getFirstName();
                     indexRow++;
 

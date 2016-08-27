@@ -13,7 +13,6 @@ import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import siscafe.model.RemittancesCaffee;
 import siscafe.model.WeighingPackagingCaffee;
 import siscafe.persistence.exceptions.NonexistentEntityException;
 
@@ -162,10 +161,22 @@ public class WeighingPackagingCaffeeJpaController implements Serializable {
         }
     }
     
-    public List<WeighingPackagingCaffee> findWeighingPackagingCaffeeEntitiesByRemettances(RemittancesCaffee remittancesCaffee) {
+    public List<WeighingPackagingCaffee> findWeighingPackagingCaffeeEntitiesByRemettances(int remittancesCaffeeId) {
         EntityManager em = getEntityManager();
-        Query query = em.createQuery("SELECT wrc FROM WeighingPackagingCaffee wrc where wrc.remittancesCafeeId=:remittancesCaffee");
-        query.setParameter("remittancesCaffee", remittancesCaffee);
+        Query query = em.createQuery("SELECT wrc FROM WeighingPackagingCaffee wrc WHERE wrc.remittancesCafeeId.id=:remittancesCaffeeId AND wrc.isFraction=false");
+        query.setParameter("remittancesCaffeeId", remittancesCaffeeId);
+        try {
+            return (List<WeighingPackagingCaffee>) query.getResultList();
+        }
+        catch(Exception e) {
+            return null;
+        }
+    }
+    
+    public List<WeighingPackagingCaffee> findWeighingPackagingCaffeeByRemettances(int remittancesCaffeeId) {
+        EntityManager em = getEntityManager();
+        Query query = em.createQuery("SELECT wrc FROM WeighingPackagingCaffee wrc WHERE wrc.remittancesCafeeId.id=:remittancesCaffeeId AND wrc.isFraction=false");
+        query.setParameter("remittancesCaffeeId", remittancesCaffeeId);
         try {
             return (List<WeighingPackagingCaffee>) query.getResultList();
         }

@@ -2,6 +2,7 @@
 package siscafe.view.frontend;
 
 import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
@@ -16,10 +17,12 @@ import javax.swing.tree.DefaultTreeModel;
 import siscafe.controller.CategoryPermitsController;
 import siscafe.controller.CitySourceController;
 import siscafe.controller.ClientsController;
+import siscafe.controller.CommodityCaffeeDeliverController;
 import siscafe.controller.ConfiguratorOperationController;
 import siscafe.controller.CustomsController;
 import siscafe.controller.DailyDonwloadCaffeeController;
 import siscafe.controller.DepartamentsController;
+import siscafe.controller.FractionPalletCaffeeController;
 import siscafe.controller.FullConsultStateCaffeeController;
 import siscafe.controller.ItemsServicesController;
 import siscafe.controller.ShippingLinesController;
@@ -81,6 +84,11 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
      */
     public Frontend() {
         initComponents();
+        setIcon();
+    }
+    
+    public void setIcon(){
+        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/siscafe/images/siscafe-favicon.png")));
     }
     
     public void initConfig() {
@@ -470,6 +478,16 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
                 jTree2.clearSelection();
                 System.out.println("asdasd");
                 break;
+            case "Registro de Mercancia Entrega":
+                commodityCaffeeDeliverView = new CommodityCaffeeDeliverView();
+                jDesktopPane1.removeAll();
+                jDesktopPane1.add(commodityCaffeeDeliverView);
+                commodityCaffeeDeliverView.setVisible(true);
+                commodityCaffeeDeliverController = new CommodityCaffeeDeliverController(commodityCaffeeDeliverView);
+                commodityCaffeeDeliverController.initListener();
+                jLabel2.setText("Registro de Mercancia Entrega");
+                jTree2.clearSelection();
+                break;
             case "Items de servicios":
                 itemsServicesModel = new ItemsServices();
                 itemsServicesView = new ItemsServicesView();
@@ -522,6 +540,16 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
                 jDesktopPane1.add(dailyDownloadCaffeeView);
                 dailyDownloadCaffeeView.setVisible(true);
                 jLabel2.setText("Reporte - Descargue café en bodega");
+                jTree2.clearSelection();
+                break;
+            case "Fraccion de Pallets":
+                fractionPalletCaffeeView = new FractionPalletCaffeeView();
+                fractionPalletCaffeeController = new FractionPalletCaffeeController(fractionPalletCaffeeView);
+                jDesktopPane1.removeAll();
+                fractionPalletCaffeeController.initListener();
+                jDesktopPane1.add(fractionPalletCaffeeView);
+                fractionPalletCaffeeView.setVisible(true);
+                jLabel2.setText("Fraccion de Pallets");
                 jTree2.clearSelection();
                 break;
             case "Ciudades origenes":
@@ -599,6 +627,10 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
         }
     }//GEN-LAST:event_jTree2ValueChanged
 
+    private FractionPalletCaffeeController fractionPalletCaffeeController;
+    private FractionPalletCaffeeView fractionPalletCaffeeView;
+    private CommodityCaffeeDeliverController commodityCaffeeDeliverController;
+    private CommodityCaffeeDeliverView commodityCaffeeDeliverView;
     private PackagingCaffee packagingCaffee;
     private NavyAgentController navyAgentController;
     private NavyAgentView navyAgentView;

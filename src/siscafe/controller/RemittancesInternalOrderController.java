@@ -21,10 +21,13 @@ import javax.persistence.Persistence;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import siscafe.model.Clients;
+import siscafe.model.DetailPackagingCaffee;
+import siscafe.model.DetailPackagingCaffeePK;
 import siscafe.model.NavyAgent;
 import siscafe.model.PackagingCaffee;
 import siscafe.model.PortOperators;
@@ -45,7 +48,7 @@ import siscafe.view.frontend.RemittancesInternalOrderView;
  *
  * @author Administrador
  */
-public class RemittancesInternalOrderController implements ActionListener, ItemListener, ListSelectionListener {
+public class RemittancesInternalOrderController implements ActionListener, ItemListener {
     
     public RemittancesInternalOrderController(RemittancesInternalOrderView remittancesInternalOrderView, String username) {
         this.remittancesInternalOrderView = remittancesInternalOrderView;
@@ -57,7 +60,6 @@ public class RemittancesInternalOrderController implements ActionListener, ItemL
         remittancesInternalOrderView.jButton4.addActionListener(this);
         remittancesInternalOrderView.jButton6.addActionListener(this);
         remittancesInternalOrderView.jButton1.addActionListener(this);
-        remittancesInternalOrderView.jTable2.getSelectionModel().addListSelectionListener(this);
         clientsJpaController = new ClientsJpaController(Persistence.createEntityManagerFactory( "SISCAFE" ));
         remittancesCaffeeJpaController = new RemittancesCaffeeJpaController(Persistence.createEntityManagerFactory( "SISCAFE" ));
         shippingLinesJpaController = new ShippingLinesJpaController(Persistence.createEntityManagerFactory( "SISCAFE" ));
@@ -76,6 +78,9 @@ public class RemittancesInternalOrderController implements ActionListener, ItemL
         listShippingLines = shippingLinesJpaController.findShippingLinesEntities();
         listPortOperators = portOperatorsJpaController.findPortOperatorsEntities();
         listNavyAgent = navyAgentJpaController.findNavyAgentEntities();
+        listDetailPackagingCaffee = new ArrayList();
+        initListenerListRemittancesCaffee();
+        initListenerListRemittancesCovered();
     }
     
     @Override
@@ -102,8 +107,45 @@ public class RemittancesInternalOrderController implements ActionListener, ItemL
         new Reports().reportCommodityCaffeeDeliver(DEX, this.username);
     }
     
+    public void initListenerListRemittancesCovered() {
+        ListSelectionModel model=remittancesInternalOrderView.jTable2.getSelectionModel();
+        model.addListSelectionListener((ListSelectionEvent e) -> {
+            int showInternalConfirmDialog = JOptionPane.showInternalConfirmDialog(remittancesInternalOrderView, "¿Desea borrar esta remesa amparada?", "Borrar programación", JOptionPane.YES_NO_OPTION);
+            if(showInternalConfirmDialog == 0) {
+                int selectedRow=remittancesInternalOrderView.jTable1.getSelectedRow();
+                String idRemittancesCaffee = String.valueOf(rowDataCovered[selectedRow][0]);
+                modifyListDetailPackagingCaffee(Integer.parseInt(idRemittancesCaffee));
+                showListDetailPackagingCaffee();
+                remittancesInternalOrderView.jTable2.clearSelection();
+                System.out.println(idRemittancesCaffee);
+            }
+        });
+    }
+    
+    public void initListenerListRemittancesCaffee() {
+        Date dateNow = new Date();
+        ListSelectionModel model=remittancesInternalOrderView.jTable1.getSelectionModel();
+        model.addListSelectionListener((ListSelectionEvent e) -> {
+            if(!model.isSelectionEmpty()){
+                int selectedRow=remittancesInternalOrderView.jTable1.getSelectedRow();
+                String idRemittancesCaffee = String.valueOf(rowDataProcess[selectedRow][1]);
+                int numBags = Integer.parseInt(JOptionPane.showInternalInputDialog(remittancesInternalOrderView, "¿Cuantos sacos desea programar para embalar de la remesa "+idRemittancesCaffee+"?", "Confirmación", JOptionPane.YES_NO_OPTION));
+                if(numBags > 0) {
+                    RemittancesCaffee findRemittancesCaffee = remittancesCaffeeJpaController.findRemittancesCaffee(Integer.parseInt(idRemittancesCaffee));
+                    DetailPackagingCaffee detailPackagingCaffee = new DetailPackagingCaffee();
+                    detailPackagingCaffee.setCreatedDate(dateNow);
+                    detailPackagingCaffee.setUpdatedDate(dateNow);
+                    detailPackagingCaffee.setQuantityRadicatedBagOut(numBags);
+                    detailPackagingCaffee.setRemittancesCaffee(findRemittancesCaffee);
+                    listDetailPackagingCaffee.add(detailPackagingCaffee);
+                }
+                showListDetailPackagingCaffee();
+            }
+        });
+    }
+    
     private void add() {
-        int row[] = remittancesInternalOrderView.jTable1.getSelectedRows();
+        int rowRemittancesCaffee = remittancesInternalOrderView.jTable1.getSelectedRow();
         Date dateNow = remittancesInternalOrderView.jXDatePicker1.getDate();
         DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         String DEX = remittancesInternalOrderView.jTextField1.getText();
@@ -117,18 +159,6 @@ public class RemittancesInternalOrderController implements ActionListener, ItemL
         packagingCaffee.setCreatedDate(new Date(formatter.format(dateNow)));
         packagingCaffee.setMotorShipId(remittancesInternalOrderView.jTextField2.getText());
         packagingCaffee.setPackagingMode((String)remittancesInternalOrderView.jComboBox2.getSelectedItem());
-        for(int i=0;i<row.length; i++){
-            int remittancesId =  (int) this.defaultTableModel.getValueAt(row[i], 1);
-            RemittancesCaffee remittancesCaffee = remittancesCaffeeJpaController.findRemittancesCaffee(remittancesId);
-            remittancesCaffee.setStatusOperation(4);
-            try {
-                remittancesCaffeeJpaController.edit(remittancesCaffee);
-            } catch (Exception ex) {
-                Logger.getLogger(RemittancesInternalOrderController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            listRemittancesCaffee.add(remittancesCaffee);
-        }
-        packagingCaffee.setRemittancesCaffeeList(listRemittancesCaffee);
         try {
             packagingCaffeeJpaController.create(packagingCaffee);
             Iterator<RemittancesCaffee> remittancesCaffeeIterator = packagingCaffee.getRemittancesCaffeeList().iterator();
@@ -140,7 +170,7 @@ public class RemittancesInternalOrderController implements ActionListener, ItemL
         } catch (Exception ex) {
             Logger.getLogger(RemittancesInternalOrderController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        listRemittancesCaffee(listRemittancesCaffee);
+        //listRemittancesCaffee(listRemittancesCaffee);
         new Reports().reportCommodityCaffeeDeliver(packagingCaffee.getExportStatement(), "juandabe");
         JOptionPane.showInternalMessageDialog(remittancesInternalOrderView, "Se guardo correctamente la programación", "Programación de Café", JOptionPane.INFORMATION_MESSAGE);
     }
@@ -168,7 +198,7 @@ public class RemittancesInternalOrderController implements ActionListener, ItemL
             }
             index++;
         }
-        listRemittancesCaffee(listRemittancesCaffee);
+        //listRemittancesCaffee(listRemittancesCaffee);
         packagingCaffee.setExportStatement(DEX);
         packagingCaffee.setPackagingType((String) remittancesInternalOrderView.jComboBox1.getSelectedItem());
         packagingCaffee.setNavyAgentId(findNavyAgentByNameLocal((String) remittancesInternalOrderView.jComboBox6.getSelectedItem()));
@@ -208,7 +238,7 @@ public class RemittancesInternalOrderController implements ActionListener, ItemL
         PackagingCaffee packagingCaffeeFind = packagingCaffeeJpaController.findPackingCaffeeByDEX(DEX);
         if(packagingCaffeeFind != null) {
             List<RemittancesCaffee> listFindPackingCaffeeByDEX = packagingCaffeeJpaController.findPackingCaffeeByDEX(DEX).getRemittancesCaffeeList();
-            listRemittancesCaffee(listFindPackingCaffeeByDEX);
+            //listRemittancesCaffee(listFindPackingCaffeeByDEX);
             remittancesInternalOrderView.jXDatePicker1.setDate(packagingCaffeeFind.getCreatedDate());
             remittancesInternalOrderView.jComboBox1.setSelectedItem(packagingCaffeeFind.getPackagingType());
             remittancesInternalOrderView.jComboBox2.setSelectedItem(packagingCaffeeFind.getPackagingMode());
@@ -227,15 +257,17 @@ public class RemittancesInternalOrderController implements ActionListener, ItemL
         }
     }
     
-    private void listRemittancesCaffee(List <RemittancesCaffee> listRemittancesCaffee) {
-        int sizeList = listRemittancesCaffee.size();
-        rowDataCovered = new Object[sizeList][1];
-        Iterator <RemittancesCaffee> iteratorRemittancesCaffee = listRemittancesCaffee.iterator();
+    private void showListDetailPackagingCaffee() {
+        int sizeList = listDetailPackagingCaffee.size();
+        rowDataCovered = new Object[sizeList][3];
+        Iterator <DetailPackagingCaffee> iteratorRemittancesCaffee = listDetailPackagingCaffee.iterator();
         int indexRow=0;
-        Object columnNames[] = {"Remesa"};
+        Object columnNames[] = {"Remesa","Lote","# Sacos"};
         while(iteratorRemittancesCaffee.hasNext()) {
-            RemittancesCaffee remittance = iteratorRemittancesCaffee.next();
-            rowDataCovered[indexRow][0] = remittance.getId();
+            DetailPackagingCaffee detailPackagingCaffee = iteratorRemittancesCaffee.next();
+            rowDataCovered[indexRow][0] = detailPackagingCaffee.getRemittancesCaffee().getId();
+            rowDataCovered[indexRow][1] = detailPackagingCaffee.getRemittancesCaffee().getLotCaffee();
+            rowDataCovered[indexRow][2] = detailPackagingCaffee.getQuantityRadicatedBagOut();
             indexRow++;
         }
         remittancesCaffeeCovered = new DefaultTableModel(rowDataCovered,columnNames);
@@ -317,6 +349,18 @@ public class RemittancesInternalOrderController implements ActionListener, ItemL
         }
         return portOperators;
     }
+    
+    private void modifyListDetailPackagingCaffee(int idRemittancesCaffee){
+        int size = listDetailPackagingCaffee.size();
+        int ind=0;
+        while(ind != size) {
+            DetailPackagingCaffee get = listDetailPackagingCaffee.get(ind);
+            if(get.getRemittancesCaffee().getId() == idRemittancesCaffee) {
+                listDetailPackagingCaffee.remove(ind);
+            }
+            ind++;
+        }
+    }
 
     @Override
     public void itemStateChanged(ItemEvent e) {
@@ -328,17 +372,7 @@ public class RemittancesInternalOrderController implements ActionListener, ItemL
         }
     }
     
-    @Override
-    public void valueChanged(ListSelectionEvent e) {
-        int showInternalConfirmDialog = JOptionPane.showInternalConfirmDialog(remittancesInternalOrderView, "¿Desea borrar esta programación?", "Borrar programación", JOptionPane.YES_NO_OPTION);
-            if(showInternalConfirmDialog == 0) {
-                int valueAt = (int)remittancesCaffeeCovered.getValueAt(e.getFirstIndex(), 0);
-                edit(valueAt);
-                remittancesInternalOrderView.jTable2.clearSelection();
-                remittancesInternalOrderView.jTable2.repaint();
-            }
-    }
-    
+    List <DetailPackagingCaffee> listDetailPackagingCaffee;
     private String username;
     private Object[][] rowDataCovered;
     private DefaultTableModel defaultTableModel;
