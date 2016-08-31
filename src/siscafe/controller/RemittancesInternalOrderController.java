@@ -58,7 +58,6 @@ public class RemittancesInternalOrderController implements ActionListener, ItemL
     public void initListener() {
         remittancesInternalOrderView.jComboBox3.addItemListener(this);
         remittancesInternalOrderView.jButton4.addActionListener(this);
-        remittancesInternalOrderView.jButton6.addActionListener(this);
         remittancesInternalOrderView.jButton1.addActionListener(this);
         clientsJpaController = new ClientsJpaController(Persistence.createEntityManagerFactory( "SISCAFE" ));
         remittancesCaffeeJpaController = new RemittancesCaffeeJpaController(Persistence.createEntityManagerFactory( "SISCAFE" ));
@@ -72,7 +71,6 @@ public class RemittancesInternalOrderController implements ActionListener, ItemL
         navyAgentComboxModel = new MyComboBoxModel(navyAgentJpaController.findNavyAgentEntities());
         remittancesInternalOrderView.jComboBox3.setModel(exportersComboxModel);
         remittancesInternalOrderView.jComboBox4.setModel(shippingLinesComboxModel);
-        remittancesInternalOrderView.jComboBox5.setModel(portOperatorComboxModel);
         remittancesInternalOrderView.jComboBox6.setModel(navyAgentComboxModel);
         listClients = clientsJpaController.findClientsEntities();
         listShippingLines = shippingLinesJpaController.findShippingLinesEntities();
@@ -146,7 +144,6 @@ public class RemittancesInternalOrderController implements ActionListener, ItemL
     
     private void add() {
         int rowRemittancesCaffee = remittancesInternalOrderView.jTable1.getSelectedRow();
-        Date dateNow = remittancesInternalOrderView.jXDatePicker1.getDate();
         DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         String DEX = remittancesInternalOrderView.jTextField1.getText();
         List <RemittancesCaffee> listRemittancesCaffee = new ArrayList();
@@ -155,8 +152,6 @@ public class RemittancesInternalOrderController implements ActionListener, ItemL
         packagingCaffee.setPackagingType((String) remittancesInternalOrderView.jComboBox1.getSelectedItem());
         packagingCaffee.setNavyAgentId(findNavyAgentByNameLocal((String) remittancesInternalOrderView.jComboBox6.getSelectedItem()));
         packagingCaffee.setShippingLinesId(findshippingLinesByNameLocal((String) remittancesInternalOrderView.jComboBox4.getSelectedItem()));
-        packagingCaffee.setPortOperatorsId(findPortOperatorsByNameLocal((String) remittancesInternalOrderView.jComboBox5.getSelectedItem()));
-        packagingCaffee.setCreatedDate(new Date(formatter.format(dateNow)));
         packagingCaffee.setMotorShipId(remittancesInternalOrderView.jTextField2.getText());
         packagingCaffee.setPackagingMode((String)remittancesInternalOrderView.jComboBox2.getSelectedItem());
         try {
@@ -176,7 +171,6 @@ public class RemittancesInternalOrderController implements ActionListener, ItemL
     }
     
     private void edit(int remittancesCaffeeId) {
-        Date dateNow = remittancesInternalOrderView.jXDatePicker1.getDate();
         DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm");
         String DEX = remittancesInternalOrderView.jTextField1.getText();
         PackagingCaffee packagingCaffee = packagingCaffeeJpaController.findPackingCaffeeByDEX(DEX);
@@ -203,8 +197,6 @@ public class RemittancesInternalOrderController implements ActionListener, ItemL
         packagingCaffee.setPackagingType((String) remittancesInternalOrderView.jComboBox1.getSelectedItem());
         packagingCaffee.setNavyAgentId(findNavyAgentByNameLocal((String) remittancesInternalOrderView.jComboBox6.getSelectedItem()));
         packagingCaffee.setShippingLinesId(findshippingLinesByNameLocal((String) remittancesInternalOrderView.jComboBox4.getSelectedItem()));
-        packagingCaffee.setPortOperatorsId(findPortOperatorsByNameLocal((String) remittancesInternalOrderView.jComboBox5.getSelectedItem()));
-        packagingCaffee.setCreatedDate(new Date(formatter.format(dateNow)));
         packagingCaffee.setMotorShipId(remittancesInternalOrderView.jTextField2.getText());
         packagingCaffee.setPackagingMode((String)remittancesInternalOrderView.jComboBox2.getSelectedItem());
         packagingCaffee.setRemittancesCaffeeList(listRemittancesCaffee);
@@ -219,15 +211,12 @@ public class RemittancesInternalOrderController implements ActionListener, ItemL
     
     private void clear() {
         remittancesInternalOrderView.jTextField1.setText("");
-        remittancesInternalOrderView.jXDatePicker1.setDate(null);
         remittancesInternalOrderView.jComboBox1.getModel().setSelectedItem("");
         remittancesInternalOrderView.jComboBox2.setSelectedItem("");
         remittancesInternalOrderView.jComboBox3.getModel().setSelectedItem("");
         remittancesInternalOrderView.jComboBox3.repaint();
         remittancesInternalOrderView.jComboBox4.getModel().setSelectedItem("");
         remittancesInternalOrderView.jComboBox4.repaint();
-        remittancesInternalOrderView.jComboBox5.getModel().setSelectedItem("");
-        remittancesInternalOrderView.jComboBox5.repaint();
         remittancesInternalOrderView.jComboBox6.getModel().setSelectedItem("");
         remittancesInternalOrderView.jComboBox6.repaint();
         remittancesInternalOrderView.jTextField2.setText("");
@@ -239,15 +228,12 @@ public class RemittancesInternalOrderController implements ActionListener, ItemL
         if(packagingCaffeeFind != null) {
             List<RemittancesCaffee> listFindPackingCaffeeByDEX = packagingCaffeeJpaController.findPackingCaffeeByDEX(DEX).getRemittancesCaffeeList();
             //listRemittancesCaffee(listFindPackingCaffeeByDEX);
-            remittancesInternalOrderView.jXDatePicker1.setDate(packagingCaffeeFind.getCreatedDate());
             remittancesInternalOrderView.jComboBox1.setSelectedItem(packagingCaffeeFind.getPackagingType());
             remittancesInternalOrderView.jComboBox2.setSelectedItem(packagingCaffeeFind.getPackagingMode());
             remittancesInternalOrderView.jComboBox3.getModel().setSelectedItem(packagingCaffeeFind.getRemittancesCaffeeList().get(0).getClientId().getBusinessName());
             remittancesInternalOrderView.jComboBox3.repaint();
             remittancesInternalOrderView.jComboBox4.getModel().setSelectedItem(packagingCaffeeFind.getShippingLinesId().getBusinessName());
             remittancesInternalOrderView.jComboBox4.repaint();
-            remittancesInternalOrderView.jComboBox5.getModel().setSelectedItem(packagingCaffeeFind.getPortOperatorsId().getName());
-            remittancesInternalOrderView.jComboBox5.repaint();
             remittancesInternalOrderView.jComboBox6.getModel().setSelectedItem(packagingCaffeeFind.getNavyAgentId().getName());
             remittancesInternalOrderView.jComboBox6.repaint();
             remittancesInternalOrderView.jTextField2.setText(packagingCaffeeFind.getMotorShipId());
