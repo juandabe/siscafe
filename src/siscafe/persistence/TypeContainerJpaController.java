@@ -15,9 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import siscafe.controller.exceptions.IllegalOrphanException;
+import siscafe.controller.exceptions.NonexistentEntityException;
 import siscafe.model.TypeContainer;
-import siscafe.persistence.exceptions.IllegalOrphanException;
-import siscafe.persistence.exceptions.NonexistentEntityException;
 
 /**
  *

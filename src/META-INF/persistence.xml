@@ -39,6 +39,11 @@
     <class>siscafe.model.PackagingCaffee</class>
     <class>siscafe.model.ContainerFilling</class>
     <class>siscafe.model.DetailPackagingCaffee</class>
+    <class>siscafe.model.AdictionalElements</class>
+    <class>siscafe.model.AdictionalElementsHasPackagingCaffee</class>
+    <class>siscafe.model.AdictionalElementsHasPackagingCaffee_1</class>
+    <class>siscafe.model.StatePackaging</class>
+    <class>siscafe.model.StateOperation</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://192.168.35.213:3306/schema_siscafe?zeroDateTimeBehavior=convertToNull"/>
       <property name="javax.persistence.jdbc.user" value="sop_user"/>

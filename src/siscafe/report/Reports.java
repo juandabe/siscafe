@@ -118,10 +118,10 @@ public class Reports {
         }
     }
     
-    public void reportCommodityCaffeeDeliver(String DEX_code, String username) {
+    public void reportCommodityCaffeeDeliver(String OIE, String username) {
         try {
             HashMap map = new HashMap();
-            map.put("DEX",DEX_code);
+            map.put("OIE",OIE);
             map.put("username",username);
             Connection conn =null;
             conn = DriverManager.getConnection("jdbc:mysql://192.168.35.213:3306/schema_siscafe?zeroDateTimeBehavior=convertToNull", "sop_user", "123");
@@ -131,7 +131,7 @@ public class Reports {
             JasperPrint print = JasperFillManager.fillReport(report, map, conn);
             JasperViewer viewer = new JasperViewer(print,false);
             viewer.setExtendedState(JFrame.MAXIMIZED_BOTH);
-            viewer.setTitle("Order Interna de Entrega "+DEX_code+" - Reporte");
+            viewer.setTitle("Order Interna de Entrega "+OIE+" - Reporte");
             viewer.setVisible(true);
         }
         catch (SQLException | JRException e){

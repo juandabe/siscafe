@@ -14,6 +14,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import siscafe.controller.AdictionalElementsController;
 import siscafe.controller.CategoryPermitsController;
 import siscafe.controller.CitySourceController;
 import siscafe.controller.ClientsController;
@@ -31,7 +32,6 @@ import siscafe.controller.NavyAgentController;
 import siscafe.controller.NoveltysCaffeeController;
 import siscafe.controller.PackingCaffeeController;
 import siscafe.controller.PermitsController;
-import siscafe.controller.PortOperatorsController;
 import siscafe.controller.ProfilesController;
 import siscafe.controller.RemittancesCaffeeController;
 import siscafe.controller.RemittancesInternalOrderController;
@@ -43,6 +43,7 @@ import siscafe.controller.TypeUnitsController;
 import siscafe.controller.UnitsCaffeeController;
 import siscafe.controller.UsersController;
 import siscafe.controller.WeighingController;
+import siscafe.model.AdictionalElements;
 import siscafe.model.CategoryPermits;
 import siscafe.model.CitySource;
 import siscafe.model.Clients;
@@ -56,7 +57,6 @@ import siscafe.model.NoveltysCaffee;
 import siscafe.model.PackagingCaffee;
 import siscafe.model.PackingCaffee;
 import siscafe.model.Permits;
-import siscafe.model.PortOperators;
 import siscafe.model.Profiles;
 import siscafe.model.RemittancesCaffee;
 import siscafe.model.Shippers;
@@ -186,6 +186,7 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
         jSplitPane1.setMinimumSize(new java.awt.Dimension(200, 100));
 
         jTree2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jTree2.setFont(new java.awt.Font("Tahoma", 0, 13)); // NOI18N
         javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("Opciones");
         jTree2.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
         jTree2.setVisibleRowCount(40);
@@ -323,6 +324,17 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
                 jLabel2.setText("Permisos");
                 jTree2.clearSelection();
                 break;
+             case "Elementos Adicionales":
+                adictionalElements = new AdictionalElements();
+                adictionalElementsView = new AdictionalElementsView();
+                jDesktopPane1.removeAll();
+                jDesktopPane1.add(adictionalElementsView);
+                adictionalElementsView.setVisible(true);
+                adictionalElementsController = new AdictionalElementsController(adictionalElementsView, adictionalElements);
+                adictionalElementsController.initListener();
+                jLabel2.setText("Elementos Adicionales");
+                jTree2.clearSelection();
+                break;
             case "Sedes":
                 departamentsModel = new Departaments();
                 departamentsView = new DepartamentsView();
@@ -409,17 +421,6 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
                 jDesktopPane1.add(markCaffeeView);
                 markCaffeeView.setVisible(true);
                 jLabel2.setText("Unidades");
-                jTree2.clearSelection();
-                break;
-            case "Operadores Portuarios":
-                portOperatorsModel = new PortOperators();
-                portOperatorsView = new PortOperatorsView();
-                jDesktopPane1.removeAll();
-                this.portOperatorsController = new PortOperatorsController(portOperatorsModel, portOperatorsView);
-                this.portOperatorsController.initListener();
-                jDesktopPane1.add(portOperatorsView);
-                portOperatorsView.setVisible(true);
-                jLabel2.setText("Operadores Portuarios");
                 jTree2.clearSelection();
                 break;
             case "Lineas navieras":
@@ -627,6 +628,9 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
         }
     }//GEN-LAST:event_jTree2ValueChanged
 
+    private AdictionalElementsController adictionalElementsController;
+    private AdictionalElementsView adictionalElementsView;
+    private AdictionalElements adictionalElements;
     private FractionPalletCaffeeController fractionPalletCaffeeController;
     private FractionPalletCaffeeView fractionPalletCaffeeView;
     private CommodityCaffeeDeliverController commodityCaffeeDeliverController;
@@ -675,8 +679,6 @@ public class Frontend extends javax.swing.JFrame implements MouseMotionListener{
     private ShippingLinesController shippingLinesController;
     private ShippingLinesView shippingLinesView;
     private ShippingLines shippingLinesModel;
-    private PortOperatorsController portOperatorsController; 
-    private PortOperators portOperatorsModel;
     private PortOperatorsView portOperatorsView;
     private MarkCaffeeView markCaffeeView;
     private MarkCaffeeController markCaffeeController;

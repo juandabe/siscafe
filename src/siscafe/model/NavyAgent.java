@@ -37,7 +37,7 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "NavyAgent.findByUpdatedDate", query = "SELECT n FROM NavyAgent n WHERE n.updatedDate = :updatedDate")})
 public class NavyAgent implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "navyAgentId")
-    private List<PackagingCaffee> packagingCaffeeoldList;
+    private List<PackagingCaffee> packagingCaffeeList;
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
@@ -127,12 +127,12 @@ public class NavyAgent implements Serializable {
     }
 
     @XmlTransient
-    public List<PackagingCaffee> getPackagingCaffeeoldList() {
-        return packagingCaffeeoldList;
+    public List<PackagingCaffee> getPackagingCaffeeList() {
+        return packagingCaffeeList;
     }
 
-    public void setPackagingCaffeeoldList(List<PackagingCaffee> packagingCaffeeoldList) {
-        this.packagingCaffeeoldList = packagingCaffeeoldList;
+    public void setPackagingCaffeeList(List<PackagingCaffee> packagingCaffeeList) {
+        this.packagingCaffeeList = packagingCaffeeList;
     }
     
 }

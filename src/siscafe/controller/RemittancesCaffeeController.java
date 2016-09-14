@@ -5,22 +5,10 @@
  */
 package siscafe.controller;
 
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Font;
-import com.itextpdf.text.FontFactory;
-import com.itextpdf.text.Image;
-import com.itextpdf.text.Phrase;
-import com.itextpdf.text.pdf.Barcode128;
-import com.itextpdf.text.pdf.PdfContentByte;
-import com.itextpdf.text.pdf.PdfPCell;
-import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfWriter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -29,12 +17,11 @@ import java.util.logging.Logger;
 import javax.persistence.Persistence;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import siscafe.model.Clients;
 import siscafe.model.PackingCaffee;
 import siscafe.model.RemittancesCaffee;
 import siscafe.model.SlotStore;
+import siscafe.model.StateOperation;
 import siscafe.model.StoresCaffee;
 import siscafe.model.UnitsCaffee;
 import siscafe.model.Users;
@@ -48,14 +35,13 @@ import siscafe.persistence.UnitsCaffeeJpaController;
 import siscafe.persistence.UsersJpaController;
 import siscafe.report.Reports;
 import siscafe.util.MyComboBoxModel;
-import siscafe.util.ReaderProperties;
 import siscafe.view.frontend.RemittancesCaffeeView;
 
 /**
  *
  * @author Administrador
  */
-public class RemittancesCaffeeController  implements ActionListener, ListSelectionListener{
+public class RemittancesCaffeeController  implements ActionListener, KeyListener{
 
     public RemittancesCaffeeController (RemittancesCaffee remittancesCaffee, String username, RemittancesCaffeeView remittancesCaffeeView) {
         this.remittancesCaffee = remittancesCaffee;
@@ -75,36 +61,9 @@ public class RemittancesCaffeeController  implements ActionListener, ListSelecti
         remittancesCaffeeView.jButton4.addActionListener(this);
         remittancesCaffeeView.jButton2.addActionListener(this);
         remittancesCaffeeView.jButton3.addActionListener(this);
-        remittancesCaffeeView.jButton5.addActionListener(this);
-        remittancesCaffeeView.jList1.addListSelectionListener(this);
         remittancesCaffeeView.jButton9.addActionListener(this);
-        remittancesCaffeeView.jButton10.addActionListener(this);
-        refresh();
-    }
-    
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        String btn = ((JButton)e.getSource()).getName();
-        switch (btn){
-            case "add":
-                add();
-            break;
-            case "edit":
-                //edit();
-            break;
-            case "refresh":
-                //refresh();
-            break;
-            case "clear":
-                //clear();
-            break;
-            case "getSlot":
-                getSlot();
-            break;
-        }
-    }
-    
-    private void refresh() {
+        remittancesCaffeeView.jTextField9.addKeyListener(this);
+        remittancesCaffeeView.jButton6.addActionListener(this);
         listClients = clientsJpaController.findClientsEntities();
         listPackingCaffee = packingCaffeeJpaController.findPackingCaffeeEntities();
         listUnitsCaffee = unitsCaffeeJpaController.findUnitsCaffeeEntities();
@@ -133,6 +92,28 @@ public class RemittancesCaffeeController  implements ActionListener, ListSelecti
         remittancesCaffeeView.jComboBox4.repaint();
     }
     
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        String btn = ((JButton)e.getSource()).getName();
+        switch (btn){
+            case "add":
+                add();
+            break;
+            case "edit":
+                edit();
+            break;
+            case "printer":
+                printer();
+            break;
+            case "clear":
+                clear();
+            break;
+            case "getSlot":
+                getSlot();
+            break;
+        }
+    }
+  
     private void getSlot() {
         String storesCaffeeString = (String) this.remittancesCaffeeView.jComboBox2.getSelectedItem();
         StoresCaffee storesCaffee = findStoresCaffeeByNameLocal(storesCaffeeString);
@@ -142,6 +123,19 @@ public class RemittancesCaffeeController  implements ActionListener, ListSelecti
         }
         else {
             remittancesCaffeeView.jTextField2.setText("-N.U-");
+        }
+    }
+    
+    private void printer(){
+        String IdRemittancesCaffee = remittancesCaffeeView.jTextField9.getText();
+        RemittancesCaffee findRemittancesCaffee = remittancesCaffeeJpaController.findRemittancesCaffee(Integer.parseInt(IdRemittancesCaffee));
+        if(findRemittancesCaffee != null){
+            new Reports().showReportRemittancesCaffeeRadicated(findRemittancesCaffee, username);
+        }
+        else{
+            JOptionPane.showMessageDialog(remittancesCaffeeView, 
+                    "No existe ningun registro", 
+                    "Error registro no existe", JOptionPane.INFORMATION_MESSAGE);
         }
     }
     
@@ -171,7 +165,7 @@ public class RemittancesCaffeeController  implements ActionListener, ListSelecti
         remittancesCaffee.setStaffSampleId(findUsersByNameLocal(samplerUsers));
         Double weightCaffeeNominal = unitsCaffeeLocal.getQuantity()*(Double.valueOf(this.remittancesCaffeeView.jTextField10.getText()));
         remittancesCaffee.setTotalWeightNetNominal(weightCaffeeNominal);
-        remittancesCaffee.setStatusOperation(Integer.valueOf(new ReaderProperties().getProperties("STATUS_CAFFEE_RADICATED")));
+        remittancesCaffee.setStatusOperation(new StateOperation(6));
         remittancesCaffee.setIsActive(true);
         remittancesCaffee.setTotalTare(0);
         remittancesCaffee.setQuantityBagInStore(0);
@@ -197,21 +191,69 @@ public class RemittancesCaffeeController  implements ActionListener, ListSelecti
     }
     
     public void edit() {
-        Date dNow = new Date( );
-        remittancesCaffeeSelected.setCreatedDate(dNow);
-        remittancesCaffeeSelected.setQuantityBagInStore(Integer.valueOf(this.remittancesCaffeeView.jTextField10.getText()));
-        remittancesCaffeeSelected.setLotCaffee(remittancesCaffeeView.jTextField3.getText());
-        remittancesCaffeeSelected.setAutoOtm(remittancesCaffeeView.jTextField4.getText()); 
-        remittancesCaffeeSelected.setVehiclePlate(remittancesCaffeeView.jTextField7.getText());
-        remittancesCaffeeSelected.setGuideId(remittancesCaffeeView.jTextField5.getText());
+        String IdRemittancesCaffee = remittancesCaffeeView.jTextField9.getText();
+        RemittancesCaffee findRemittancesCaffee = remittancesCaffeeJpaController.findRemittancesCaffee(Integer.parseInt(IdRemittancesCaffee));
+        Date dNow = new Date();
+        findRemittancesCaffee.setCreatedDate(dNow);
+        findRemittancesCaffee.setUpdatedDated(dNow);
+        findRemittancesCaffee.setQuantityBagRadicatedIn(Integer.valueOf(this.remittancesCaffeeView.jTextField10.getText()));
+        String lotCaffee = remittancesCaffeeView.jTextField3.getText();
+        findRemittancesCaffee.setLotCaffee(lotCaffee);
+        findRemittancesCaffee.setAutoOtm(remittancesCaffeeView.jTextField4.getText()); 
+        findRemittancesCaffee.setVehiclePlate(remittancesCaffeeView.jTextField7.getText());
+        String guideId = remittancesCaffeeView.jTextField5.getText();
+        findRemittancesCaffee.setGuideId(guideId);
+        String slotStore = (String) this.remittancesCaffeeView.jTextField2.getText();
+        findRemittancesCaffee.setSlotStoreId(findSlotStoreByNameLocal(slotStore));
+        String clients = (String) this.remittancesCaffeeView.jComboBox1.getSelectedItem();
+        findRemittancesCaffee.setClientId(findClientsByNameLocal(clients));
+        String unitsCaffee = (String) this.remittancesCaffeeView.jComboBox3.getSelectedItem();
+        UnitsCaffee unitsCaffeeLocal = findUnitsCaffeeByNameLocal(unitsCaffee);
+        findRemittancesCaffee.setUnitsCafeeId(unitsCaffeeLocal);
+        String packingCaffee = (String) this.remittancesCaffeeView.jComboBox4.getSelectedItem();
+        findRemittancesCaffee.setPackingCafeeId(findPackingCaffeeByNameLocal(packingCaffee));
+        String driverUsers = (String) this.remittancesCaffeeView.jComboBox6.getSelectedItem();
+        findRemittancesCaffee.setStaffDriverId(findUsersByNameLocal(driverUsers));
+        String samplerUsers = (String) this.remittancesCaffeeView.jComboBox5.getSelectedItem();
+        findRemittancesCaffee.setStaffSampleId(findUsersByNameLocal(samplerUsers));
         try {
-            remittancesCaffeeJpaController.edit(remittancesCaffeeSelected);
+            remittancesCaffeeJpaController.edit(findRemittancesCaffee);
         } catch (Exception ex) {
             Logger.getLogger(RemittancesCaffeeController.class.getName()).log(Level.SEVERE, null, ex);
         }
         JOptionPane.showInternalMessageDialog(remittancesCaffeeView, "Registro actualizado", 
                 "Confirmación", JOptionPane.INFORMATION_MESSAGE);
-        refresh();
+    }
+    
+    public void find(String IdRemittancesCaffee){
+        RemittancesCaffee findRemittancesCaffee = remittancesCaffeeJpaController.findRemittancesCaffee(Integer.parseInt(IdRemittancesCaffee));
+        if(findRemittancesCaffee != null){
+            remittancesCaffeeView.jTextField10.setText(String.valueOf(findRemittancesCaffee.getQuantityBagRadicatedIn()));
+            remittancesCaffeeView.jComboBox3.getModel().setSelectedItem(findRemittancesCaffee.getUnitsCafeeId());
+            remittancesCaffeeView.jComboBox1.getModel().setSelectedItem(findRemittancesCaffee.getClientId());
+            remittancesCaffeeView.jTextField3.setText(findRemittancesCaffee.getLotCaffee());
+            remittancesCaffeeView.jTextField4.setText(findRemittancesCaffee.getAutoOtm());
+            remittancesCaffeeView.jTextField7.setText(findRemittancesCaffee.getVehiclePlate());
+            remittancesCaffeeView.jTextField5.setText(findRemittancesCaffee.getGuideId());
+            remittancesCaffeeView.jComboBox4.getModel().setSelectedItem(findRemittancesCaffee.getPackingCafeeId());
+            remittancesCaffeeView.jComboBox4.repaint();
+            remittancesCaffeeView.jComboBox1.getModel().setSelectedItem(findRemittancesCaffee.getClientId());
+            remittancesCaffeeView.jComboBox1.repaint();
+            remittancesCaffeeView.jComboBox5.getModel().setSelectedItem(findRemittancesCaffee.getStaffSampleId());
+            remittancesCaffeeView.jComboBox5.repaint();
+            remittancesCaffeeView.jComboBox6.getModel().setSelectedItem(findRemittancesCaffee.getStaffDriverId());
+            remittancesCaffeeView.jComboBox6.repaint();
+            remittancesCaffeeView.jComboBox2.getModel().setSelectedItem(findRemittancesCaffee.getSlotStoreId().getStoresCaffeeId());
+            remittancesCaffeeView.jComboBox2.repaint();
+            remittancesCaffeeView.jComboBox3.getModel().setSelectedItem(findRemittancesCaffee.getUnitsCafeeId());
+            remittancesCaffeeView.jComboBox3.repaint();
+            remittancesCaffeeView.jTextField2.setText(findRemittancesCaffee.getSlotStoreId().getNameSpace());
+        }
+        else{
+            JOptionPane.showMessageDialog(remittancesCaffeeView, 
+                    "No existe ningun registro", 
+                    "Error regisrto no existe", JOptionPane.INFORMATION_MESSAGE);
+        }
     }
     
     public void clear() {
@@ -219,19 +261,16 @@ public class RemittancesCaffeeController  implements ActionListener, ListSelecti
         this.remittancesCaffeeView.jTextField4.setText("");
         this.remittancesCaffeeView.jTextField7.setText("");
         this.remittancesCaffeeView.jTextField5.setText("");
+        remittancesCaffeeView.jTextField9.setText("");
+        remittancesCaffeeView.jTextField10.setText("");
+        remittancesCaffeeView.jTextField3.setText("");
+        remittancesCaffeeView.jTextField4.setText("");
+        remittancesCaffeeView.jTextField5.setText("");
+        remittancesCaffeeView.jTextField5.setText("");
         this.remittancesCaffeeView.jComboBox1.setSelectedItem("");
     }
     
-    @Override
-    public void valueChanged(ListSelectionEvent e) {
-        if(e.getValueIsAdjusting()) {
-            String remmittangeNumber = (String) this.remittancesCaffeeView.jList1.getSelectedValue();
-            this.remittancesCaffeeSelected = findRemittancesCaffeeByNameLocal(remmittangeNumber);
-            this.remittancesCaffeeView.jTextField10.setText(String.valueOf(remittancesCaffeeSelected.getQuantityBagInStore()));
-            remittancesCaffeeView.jComboBox3.setSelectedItem(remittancesCaffeeSelected.getUnitsCafeeId());
-        }
-    }
-    
+  
     private StoresCaffee findStoresCaffeeByNameLocal(String name) {
         Iterator<StoresCaffee> iterator = this.listStoresCaffee.iterator();
         StoresCaffee storesCaffee = null;
@@ -345,4 +384,24 @@ public class RemittancesCaffeeController  implements ActionListener, ListSelecti
     private SlotStoreJpaController slotStoreJpaController;
     private UsersJpaController usersJpaController;
     private ProfilesJpaController profilesJpaController;
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        if(e.getKeyCode() == 10){
+            String IdRemittancesCaffee = remittancesCaffeeView.jTextField9.getText();
+            if(IdRemittancesCaffee != null){
+                find(IdRemittancesCaffee);
+            }
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

@@ -40,7 +40,7 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "ShippingLines.findByUpdatedDate", query = "SELECT s FROM ShippingLines s WHERE s.updatedDate = :updatedDate")})
 public class ShippingLines implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "shippingLinesId")
-    private List<PackagingCaffee> packagingCaffeeoldList;
+    private List<PackagingCaffee> packagingCaffeeList;
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -141,12 +141,12 @@ public class ShippingLines implements Serializable {
     }
 
     @XmlTransient
-    public List<PackagingCaffee> getPackagingCaffeeoldList() {
-        return packagingCaffeeoldList;
+    public List<PackagingCaffee> getPackagingCaffeeList() {
+        return packagingCaffeeList;
     }
 
-    public void setPackagingCaffeeoldList(List<PackagingCaffee> packagingCaffeeoldList) {
-        this.packagingCaffeeoldList = packagingCaffeeoldList;
+    public void setPackagingCaffeeList(List<PackagingCaffee> packagingCaffeeList) {
+        this.packagingCaffeeList = packagingCaffeeList;
     }
     
 }

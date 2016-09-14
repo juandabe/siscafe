@@ -35,10 +35,21 @@ import javax.xml.bind.annotation.XmlTransient;
 @NamedQueries({
     @NamedQuery(name = "PackagingCaffee.findAll", query = "SELECT p FROM PackagingCaffee p"),
     @NamedQuery(name = "PackagingCaffee.findById", query = "SELECT p FROM PackagingCaffee p WHERE p.id = :id"),
-    @NamedQuery(name = "PackagingCaffee.findByContainerBicCode", query = "SELECT p FROM PackagingCaffee p WHERE p.containerBicCode = :containerBicCode"),
     @NamedQuery(name = "PackagingCaffee.findByPackagingType", query = "SELECT p FROM PackagingCaffee p WHERE p.packagingType = :packagingType"),
     @NamedQuery(name = "PackagingCaffee.findByExportStatement", query = "SELECT p FROM PackagingCaffee p WHERE p.exportStatement = :exportStatement")})
 public class PackagingCaffee implements Serializable {
+
+    @Basic(optional = false)
+    @Column(name = "weight_to_out")
+    private boolean weightToOut;
+    @Basic(optional = false)
+    @Column(name = "booking_expo")
+    private String bookingExpo;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "packagingCaffee")
+    private List<AdictionalElementsHasPackagingCaffee> adictionalElementsHasPackagingCaffeeList;
+    @JoinColumn(name = "state_packaging_id", referencedColumnName = "id")
+    @ManyToOne(optional = false)
+    private StatePackaging statePackagingId;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "packagingCaffee")
     private List<DetailPackagingCaffee> detailPackagingCaffeeList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "packagingCaffeeId")
@@ -46,9 +57,6 @@ public class PackagingCaffee implements Serializable {
     @JoinColumn(name = "navy_agent_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private NavyAgent navyAgentId;
-    @JoinColumn(name = "port_operators_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
-    private PortOperators portOperatorsId;
     @Basic(optional = false)
     @Column(name = "motor_ship_name")
     private String motorShipId;
@@ -62,8 +70,8 @@ public class PackagingCaffee implements Serializable {
     @Column(name = "id")
     private Integer id;
     @Basic(optional = false)
-    @Column(name = "container_bic_code")
-    private String containerBicCode;
+    @Column(name = "iso_container")
+    private String isoCtn;
     @Basic(optional = false)
     @Column(name = "packaging_mode")
     private String packagingMode;
@@ -90,9 +98,8 @@ public class PackagingCaffee implements Serializable {
         this.id = id;
     }
 
-    public PackagingCaffee(Integer id, String containerBicCode, String packagingType, String exportStatement) {
+    public PackagingCaffee(Integer id, String packagingType, String exportStatement) {
         this.id = id;
-        this.containerBicCode = containerBicCode;
         this.packagingType = packagingType;
         this.exportStatement = exportStatement;
     }
@@ -117,19 +124,11 @@ public class PackagingCaffee implements Serializable {
         return id;
     }
 
-    public PortOperators getPortOperatorsId() {
-        return portOperatorsId;
-    }
-
-    public void setPortOperatorsId(PortOperators portOperatorsId) {
-        this.portOperatorsId = portOperatorsId;
-    }
-
-    public String getMotorShipId() {
+    public String getMotorShipName() {
         return motorShipId;
     }
 
-    public void setMotorShipId(String motorShipId) {
+    public void setMotorShipName(String motorShipId) {
         this.motorShipId = motorShipId;
     }
 
@@ -137,12 +136,12 @@ public class PackagingCaffee implements Serializable {
         this.id = id;
     }
 
-    public String getContainerBicCode() {
-        return containerBicCode;
+    public String getIsoCtn() {
+        return isoCtn;
     }
 
-    public void setContainerBicCode(String containerBicCode) {
-        this.containerBicCode = containerBicCode;
+    public void setIsoCtn(String isoCtn) {
+        this.isoCtn = isoCtn;
     }
 
     public String getPackagingType() {
@@ -234,6 +233,39 @@ public class PackagingCaffee implements Serializable {
 
     public void setDetailPackagingCaffeeList(List<DetailPackagingCaffee> detailPackagingCaffeeList) {
         this.detailPackagingCaffeeList = detailPackagingCaffeeList;
+    }
+
+    public boolean getWeightToOut() {
+        return weightToOut;
+    }
+
+    public void setWeightToOut(boolean weightToOut) {
+        this.weightToOut = weightToOut;
+    }
+
+    public String getBookingExpo() {
+        return bookingExpo;
+    }
+
+    public void setBookingExpo(String bookingExpo) {
+        this.bookingExpo = bookingExpo;
+    }
+
+    @XmlTransient
+    public List<AdictionalElementsHasPackagingCaffee> getAdictionalElementsHasPackagingCaffeeList() {
+        return adictionalElementsHasPackagingCaffeeList;
+    }
+
+    public void setAdictionalElementsHasPackagingCaffeeList(List<AdictionalElementsHasPackagingCaffee> adictionalElementsHasPackagingCaffeeList) {
+        this.adictionalElementsHasPackagingCaffeeList = adictionalElementsHasPackagingCaffeeList;
+    }
+
+    public StatePackaging getStatePackagingId() {
+        return statePackagingId;
+    }
+
+    public void setStatePackagingId(StatePackaging statePackagingId) {
+        this.statePackagingId = statePackagingId;
     }
     
 }

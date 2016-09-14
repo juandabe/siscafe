@@ -10,12 +10,12 @@ import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import siscafe.model.PortOperators;
 import siscafe.model.TypeContainer;
 import siscafe.model.Customs;
 import siscafe.model.NavyAgent;
 import siscafe.model.ShippingLines;
-import siscafe.model.RemittancesCaffee;
+import siscafe.model.StatePackaging;
+import siscafe.model.AdictionalElementsHasPackagingCaffee;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -23,7 +23,6 @@ import javax.persistence.EntityManagerFactory;
 import siscafe.model.PackagingCaffee;
 import siscafe.persistence.exceptions.IllegalOrphanException;
 import siscafe.persistence.exceptions.NonexistentEntityException;
-import siscafe.persistence.exceptions.PreexistingEntityException;
 
 /**
  *
@@ -40,19 +39,14 @@ public class PackagingCaffeeJpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void create(PackagingCaffee packagingCaffee) throws PreexistingEntityException, Exception {
-        if (packagingCaffee.getRemittancesCaffeeList() == null) {
-            packagingCaffee.setRemittancesCaffeeList(new ArrayList<RemittancesCaffee>());
+    public int create(PackagingCaffee packagingCaffee) {
+        if (packagingCaffee.getAdictionalElementsHasPackagingCaffeeList() == null) {
+            packagingCaffee.setAdictionalElementsHasPackagingCaffeeList(new ArrayList<AdictionalElementsHasPackagingCaffee>());
         }
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            PortOperators portOperatorsId = packagingCaffee.getPortOperatorsId();
-            if (portOperatorsId != null) {
-                portOperatorsId = em.getReference(portOperatorsId.getClass(), portOperatorsId.getId());
-                packagingCaffee.setPortOperatorsId(portOperatorsId);
-            }
             TypeContainer typeContainerId = packagingCaffee.getTypeContainerId();
             if (typeContainerId != null) {
                 typeContainerId = em.getReference(typeContainerId.getClass(), typeContainerId.getId());
@@ -73,17 +67,18 @@ public class PackagingCaffeeJpaController implements Serializable {
                 shippingLinesId = em.getReference(shippingLinesId.getClass(), shippingLinesId.getId());
                 packagingCaffee.setShippingLinesId(shippingLinesId);
             }
-            List<RemittancesCaffee> attachedRemittancesCaffeeList = new ArrayList<RemittancesCaffee>();
-            for (RemittancesCaffee remittancesCaffeeListRemittancesCaffeeToAttach : packagingCaffee.getRemittancesCaffeeList()) {
-                remittancesCaffeeListRemittancesCaffeeToAttach = em.getReference(remittancesCaffeeListRemittancesCaffeeToAttach.getClass(), remittancesCaffeeListRemittancesCaffeeToAttach.getId());
-                attachedRemittancesCaffeeList.add(remittancesCaffeeListRemittancesCaffeeToAttach);
+            StatePackaging statePackagingId = packagingCaffee.getStatePackagingId();
+            if (statePackagingId != null) {
+                statePackagingId = em.getReference(statePackagingId.getClass(), statePackagingId.getId());
+                packagingCaffee.setStatePackagingId(statePackagingId);
             }
-            packagingCaffee.setRemittancesCaffeeList(attachedRemittancesCaffeeList);
+            List<AdictionalElementsHasPackagingCaffee> attachedAdictionalElementsHasPackagingCaffeeList = new ArrayList<AdictionalElementsHasPackagingCaffee>();
+            for (AdictionalElementsHasPackagingCaffee adictionalElementsHasPackagingCaffeeListAdictionalElementsHasPackagingCaffeeToAttach : packagingCaffee.getAdictionalElementsHasPackagingCaffeeList()) {
+                adictionalElementsHasPackagingCaffeeListAdictionalElementsHasPackagingCaffeeToAttach = em.getReference(adictionalElementsHasPackagingCaffeeListAdictionalElementsHasPackagingCaffeeToAttach.getClass(), adictionalElementsHasPackagingCaffeeListAdictionalElementsHasPackagingCaffeeToAttach.getAdictionalElementsHasPackagingCaffeePK());
+                attachedAdictionalElementsHasPackagingCaffeeList.add(adictionalElementsHasPackagingCaffeeListAdictionalElementsHasPackagingCaffeeToAttach);
+            }
+            packagingCaffee.setAdictionalElementsHasPackagingCaffeeList(attachedAdictionalElementsHasPackagingCaffeeList);
             em.persist(packagingCaffee);
-            if (portOperatorsId != null) {
-                portOperatorsId.getPackagingCaffeeList().add(packagingCaffee);
-                portOperatorsId = em.merge(portOperatorsId);
-            }
             if (typeContainerId != null) {
                 typeContainerId.getPackagingCaffeeList().add(packagingCaffee);
                 typeContainerId = em.merge(typeContainerId);
@@ -93,33 +88,33 @@ public class PackagingCaffeeJpaController implements Serializable {
                 customsId = em.merge(customsId);
             }
             if (navyAgentId != null) {
-                navyAgentId.getPackagingCaffeeoldList().add(packagingCaffee);
+                navyAgentId.getPackagingCaffeeList().add(packagingCaffee);
                 navyAgentId = em.merge(navyAgentId);
             }
             if (shippingLinesId != null) {
-                shippingLinesId.getPackagingCaffeeoldList().add(packagingCaffee);
+                shippingLinesId.getPackagingCaffeeList().add(packagingCaffee);
                 shippingLinesId = em.merge(shippingLinesId);
             }
-            for (RemittancesCaffee remittancesCaffeeListRemittancesCaffee : packagingCaffee.getRemittancesCaffeeList()) {
-                PackagingCaffee oldPackagingCaffeeIdOfRemittancesCaffeeListRemittancesCaffee = remittancesCaffeeListRemittancesCaffee.getPackagingCaffeeId();
-                remittancesCaffeeListRemittancesCaffee.setPackagingCaffeeId(packagingCaffee);
-                remittancesCaffeeListRemittancesCaffee = em.merge(remittancesCaffeeListRemittancesCaffee);
-                if (oldPackagingCaffeeIdOfRemittancesCaffeeListRemittancesCaffee != null) {
-                    oldPackagingCaffeeIdOfRemittancesCaffeeListRemittancesCaffee.getRemittancesCaffeeList().remove(remittancesCaffeeListRemittancesCaffee);
-                    oldPackagingCaffeeIdOfRemittancesCaffeeListRemittancesCaffee = em.merge(oldPackagingCaffeeIdOfRemittancesCaffeeListRemittancesCaffee);
+            if (statePackagingId != null) {
+                statePackagingId.getPackagingCaffeeList().add(packagingCaffee);
+                statePackagingId = em.merge(statePackagingId);
+            }
+            for (AdictionalElementsHasPackagingCaffee adictionalElementsHasPackagingCaffeeListAdictionalElementsHasPackagingCaffee : packagingCaffee.getAdictionalElementsHasPackagingCaffeeList()) {
+                PackagingCaffee oldPackagingCaffeeOfAdictionalElementsHasPackagingCaffeeListAdictionalElementsHasPackagingCaffee = adictionalElementsHasPackagingCaffeeListAdictionalElementsHasPackagingCaffee.getPackagingCaffee();
+                adictionalElementsHasPackagingCaffeeListAdictionalElementsHasPackagingCaffee.setPackagingCaffee(packagingCaffee);
+                adictionalElementsHasPackagingCaffeeListAdictionalElementsHasPackagingCaffee = em.merge(adictionalElementsHasPackagingCaffeeListAdictionalElementsHasPackagingCaffee);
+                if (oldPackagingCaffeeOfAdictionalElementsHasPackagingCaffeeListAdictionalElementsHasPackagingCaffee != null) {
+                    oldPackagingCaffeeOfAdictionalElementsHasPackagingCaffeeListAdictionalElementsHasPackagingCaffee.getAdictionalElementsHasPackagingCaffeeList().remove(adictionalElementsHasPackagingCaffeeListAdictionalElementsHasPackagingCaffee);
+                    oldPackagingCaffeeOfAdictionalElementsHasPackagingCaffeeListAdictionalElementsHasPackagingCaffee = em.merge(oldPackagingCaffeeOfAdictionalElementsHasPackagingCaffeeListAdictionalElementsHasPackagingCaffee);
                 }
             }
             em.getTransaction().commit();
-        } catch (Exception ex) {
-            if (findPackagingCaffee(packagingCaffee.getId()) != null) {
-                throw new PreexistingEntityException("PackagingCaffee " + packagingCaffee + " already exists.", ex);
-            }
-            throw ex;
         } finally {
             if (em != null) {
                 em.close();
             }
         }
+        return packagingCaffee.getId();
     }
 
     public void edit(PackagingCaffee packagingCaffee) throws IllegalOrphanException, NonexistentEntityException, Exception {
@@ -128,8 +123,6 @@ public class PackagingCaffeeJpaController implements Serializable {
             em = getEntityManager();
             em.getTransaction().begin();
             PackagingCaffee persistentPackagingCaffee = em.find(PackagingCaffee.class, packagingCaffee.getId());
-            PortOperators portOperatorsIdOld = persistentPackagingCaffee.getPortOperatorsId();
-            PortOperators portOperatorsIdNew = packagingCaffee.getPortOperatorsId();
             TypeContainer typeContainerIdOld = persistentPackagingCaffee.getTypeContainerId();
             TypeContainer typeContainerIdNew = packagingCaffee.getTypeContainerId();
             Customs customsIdOld = persistentPackagingCaffee.getCustomsId();
@@ -138,23 +131,21 @@ public class PackagingCaffeeJpaController implements Serializable {
             NavyAgent navyAgentIdNew = packagingCaffee.getNavyAgentId();
             ShippingLines shippingLinesIdOld = persistentPackagingCaffee.getShippingLinesId();
             ShippingLines shippingLinesIdNew = packagingCaffee.getShippingLinesId();
-            List<RemittancesCaffee> remittancesCaffeeListOld = persistentPackagingCaffee.getRemittancesCaffeeList();
-            List<RemittancesCaffee> remittancesCaffeeListNew = packagingCaffee.getRemittancesCaffeeList();
+            StatePackaging statePackagingIdOld = persistentPackagingCaffee.getStatePackagingId();
+            StatePackaging statePackagingIdNew = packagingCaffee.getStatePackagingId();
+            List<AdictionalElementsHasPackagingCaffee> adictionalElementsHasPackagingCaffeeListOld = persistentPackagingCaffee.getAdictionalElementsHasPackagingCaffeeList();
+            List<AdictionalElementsHasPackagingCaffee> adictionalElementsHasPackagingCaffeeListNew = packagingCaffee.getAdictionalElementsHasPackagingCaffeeList();
             List<String> illegalOrphanMessages = null;
-            for (RemittancesCaffee remittancesCaffeeListOldRemittancesCaffee : remittancesCaffeeListOld) {
-                if (!remittancesCaffeeListNew.contains(remittancesCaffeeListOldRemittancesCaffee)) {
+            for (AdictionalElementsHasPackagingCaffee adictionalElementsHasPackagingCaffeeListOldAdictionalElementsHasPackagingCaffee : adictionalElementsHasPackagingCaffeeListOld) {
+                if (!adictionalElementsHasPackagingCaffeeListNew.contains(adictionalElementsHasPackagingCaffeeListOldAdictionalElementsHasPackagingCaffee)) {
                     if (illegalOrphanMessages == null) {
                         illegalOrphanMessages = new ArrayList<String>();
                     }
-                    illegalOrphanMessages.add("You must retain RemittancesCaffee " + remittancesCaffeeListOldRemittancesCaffee + " since its packagingCaffeeId field is not nullable.");
+                    illegalOrphanMessages.add("You must retain AdictionalElementsHasPackagingCaffee " + adictionalElementsHasPackagingCaffeeListOldAdictionalElementsHasPackagingCaffee + " since its packagingCaffee field is not nullable.");
                 }
             }
             if (illegalOrphanMessages != null) {
                 throw new IllegalOrphanException(illegalOrphanMessages);
-            }
-            if (portOperatorsIdNew != null) {
-                portOperatorsIdNew = em.getReference(portOperatorsIdNew.getClass(), portOperatorsIdNew.getId());
-                packagingCaffee.setPortOperatorsId(portOperatorsIdNew);
             }
             if (typeContainerIdNew != null) {
                 typeContainerIdNew = em.getReference(typeContainerIdNew.getClass(), typeContainerIdNew.getId());
@@ -172,22 +163,18 @@ public class PackagingCaffeeJpaController implements Serializable {
                 shippingLinesIdNew = em.getReference(shippingLinesIdNew.getClass(), shippingLinesIdNew.getId());
                 packagingCaffee.setShippingLinesId(shippingLinesIdNew);
             }
-            List<RemittancesCaffee> attachedRemittancesCaffeeListNew = new ArrayList<RemittancesCaffee>();
-            for (RemittancesCaffee remittancesCaffeeListNewRemittancesCaffeeToAttach : remittancesCaffeeListNew) {
-                remittancesCaffeeListNewRemittancesCaffeeToAttach = em.getReference(remittancesCaffeeListNewRemittancesCaffeeToAttach.getClass(), remittancesCaffeeListNewRemittancesCaffeeToAttach.getId());
-                attachedRemittancesCaffeeListNew.add(remittancesCaffeeListNewRemittancesCaffeeToAttach);
+            if (statePackagingIdNew != null) {
+                statePackagingIdNew = em.getReference(statePackagingIdNew.getClass(), statePackagingIdNew.getId());
+                packagingCaffee.setStatePackagingId(statePackagingIdNew);
             }
-            remittancesCaffeeListNew = attachedRemittancesCaffeeListNew;
-            packagingCaffee.setRemittancesCaffeeList(remittancesCaffeeListNew);
+            List<AdictionalElementsHasPackagingCaffee> attachedAdictionalElementsHasPackagingCaffeeListNew = new ArrayList<AdictionalElementsHasPackagingCaffee>();
+            for (AdictionalElementsHasPackagingCaffee adictionalElementsHasPackagingCaffeeListNewAdictionalElementsHasPackagingCaffeeToAttach : adictionalElementsHasPackagingCaffeeListNew) {
+                adictionalElementsHasPackagingCaffeeListNewAdictionalElementsHasPackagingCaffeeToAttach = em.getReference(adictionalElementsHasPackagingCaffeeListNewAdictionalElementsHasPackagingCaffeeToAttach.getClass(), adictionalElementsHasPackagingCaffeeListNewAdictionalElementsHasPackagingCaffeeToAttach.getAdictionalElementsHasPackagingCaffeePK());
+                attachedAdictionalElementsHasPackagingCaffeeListNew.add(adictionalElementsHasPackagingCaffeeListNewAdictionalElementsHasPackagingCaffeeToAttach);
+            }
+            adictionalElementsHasPackagingCaffeeListNew = attachedAdictionalElementsHasPackagingCaffeeListNew;
+            packagingCaffee.setAdictionalElementsHasPackagingCaffeeList(adictionalElementsHasPackagingCaffeeListNew);
             packagingCaffee = em.merge(packagingCaffee);
-            if (portOperatorsIdOld != null && !portOperatorsIdOld.equals(portOperatorsIdNew)) {
-                portOperatorsIdOld.getPackagingCaffeeList().remove(packagingCaffee);
-                portOperatorsIdOld = em.merge(portOperatorsIdOld);
-            }
-            if (portOperatorsIdNew != null && !portOperatorsIdNew.equals(portOperatorsIdOld)) {
-                portOperatorsIdNew.getPackagingCaffeeList().add(packagingCaffee);
-                portOperatorsIdNew = em.merge(portOperatorsIdNew);
-            }
             if (typeContainerIdOld != null && !typeContainerIdOld.equals(typeContainerIdNew)) {
                 typeContainerIdOld.getPackagingCaffeeList().remove(packagingCaffee);
                 typeContainerIdOld = em.merge(typeContainerIdOld);
@@ -205,29 +192,37 @@ public class PackagingCaffeeJpaController implements Serializable {
                 customsIdNew = em.merge(customsIdNew);
             }
             if (navyAgentIdOld != null && !navyAgentIdOld.equals(navyAgentIdNew)) {
-                navyAgentIdOld.getPackagingCaffeeoldList().remove(packagingCaffee);
+                navyAgentIdOld.getPackagingCaffeeList().remove(packagingCaffee);
                 navyAgentIdOld = em.merge(navyAgentIdOld);
             }
             if (navyAgentIdNew != null && !navyAgentIdNew.equals(navyAgentIdOld)) {
-                navyAgentIdNew.getPackagingCaffeeoldList().add(packagingCaffee);
+                navyAgentIdNew.getPackagingCaffeeList().add(packagingCaffee);
                 navyAgentIdNew = em.merge(navyAgentIdNew);
             }
             if (shippingLinesIdOld != null && !shippingLinesIdOld.equals(shippingLinesIdNew)) {
-                shippingLinesIdOld.getPackagingCaffeeoldList().remove(packagingCaffee);
+                shippingLinesIdOld.getPackagingCaffeeList().remove(packagingCaffee);
                 shippingLinesIdOld = em.merge(shippingLinesIdOld);
             }
             if (shippingLinesIdNew != null && !shippingLinesIdNew.equals(shippingLinesIdOld)) {
-                shippingLinesIdNew.getPackagingCaffeeoldList().add(packagingCaffee);
+                shippingLinesIdNew.getPackagingCaffeeList().add(packagingCaffee);
                 shippingLinesIdNew = em.merge(shippingLinesIdNew);
             }
-            for (RemittancesCaffee remittancesCaffeeListNewRemittancesCaffee : remittancesCaffeeListNew) {
-                if (!remittancesCaffeeListOld.contains(remittancesCaffeeListNewRemittancesCaffee)) {
-                    PackagingCaffee oldPackagingCaffeeIdOfRemittancesCaffeeListNewRemittancesCaffee = remittancesCaffeeListNewRemittancesCaffee.getPackagingCaffeeId();
-                    remittancesCaffeeListNewRemittancesCaffee.setPackagingCaffeeId(packagingCaffee);
-                    remittancesCaffeeListNewRemittancesCaffee = em.merge(remittancesCaffeeListNewRemittancesCaffee);
-                    if (oldPackagingCaffeeIdOfRemittancesCaffeeListNewRemittancesCaffee != null && !oldPackagingCaffeeIdOfRemittancesCaffeeListNewRemittancesCaffee.equals(packagingCaffee)) {
-                        oldPackagingCaffeeIdOfRemittancesCaffeeListNewRemittancesCaffee.getRemittancesCaffeeList().remove(remittancesCaffeeListNewRemittancesCaffee);
-                        oldPackagingCaffeeIdOfRemittancesCaffeeListNewRemittancesCaffee = em.merge(oldPackagingCaffeeIdOfRemittancesCaffeeListNewRemittancesCaffee);
+            if (statePackagingIdOld != null && !statePackagingIdOld.equals(statePackagingIdNew)) {
+                statePackagingIdOld.getPackagingCaffeeList().remove(packagingCaffee);
+                statePackagingIdOld = em.merge(statePackagingIdOld);
+            }
+            if (statePackagingIdNew != null && !statePackagingIdNew.equals(statePackagingIdOld)) {
+                statePackagingIdNew.getPackagingCaffeeList().add(packagingCaffee);
+                statePackagingIdNew = em.merge(statePackagingIdNew);
+            }
+            for (AdictionalElementsHasPackagingCaffee adictionalElementsHasPackagingCaffeeListNewAdictionalElementsHasPackagingCaffee : adictionalElementsHasPackagingCaffeeListNew) {
+                if (!adictionalElementsHasPackagingCaffeeListOld.contains(adictionalElementsHasPackagingCaffeeListNewAdictionalElementsHasPackagingCaffee)) {
+                    PackagingCaffee oldPackagingCaffeeOfAdictionalElementsHasPackagingCaffeeListNewAdictionalElementsHasPackagingCaffee = adictionalElementsHasPackagingCaffeeListNewAdictionalElementsHasPackagingCaffee.getPackagingCaffee();
+                    adictionalElementsHasPackagingCaffeeListNewAdictionalElementsHasPackagingCaffee.setPackagingCaffee(packagingCaffee);
+                    adictionalElementsHasPackagingCaffeeListNewAdictionalElementsHasPackagingCaffee = em.merge(adictionalElementsHasPackagingCaffeeListNewAdictionalElementsHasPackagingCaffee);
+                    if (oldPackagingCaffeeOfAdictionalElementsHasPackagingCaffeeListNewAdictionalElementsHasPackagingCaffee != null && !oldPackagingCaffeeOfAdictionalElementsHasPackagingCaffeeListNewAdictionalElementsHasPackagingCaffee.equals(packagingCaffee)) {
+                        oldPackagingCaffeeOfAdictionalElementsHasPackagingCaffeeListNewAdictionalElementsHasPackagingCaffee.getAdictionalElementsHasPackagingCaffeeList().remove(adictionalElementsHasPackagingCaffeeListNewAdictionalElementsHasPackagingCaffee);
+                        oldPackagingCaffeeOfAdictionalElementsHasPackagingCaffeeListNewAdictionalElementsHasPackagingCaffee = em.merge(oldPackagingCaffeeOfAdictionalElementsHasPackagingCaffeeListNewAdictionalElementsHasPackagingCaffee);
                     }
                 }
             }
@@ -261,20 +256,15 @@ public class PackagingCaffeeJpaController implements Serializable {
                 throw new NonexistentEntityException("The packagingCaffee with id " + id + " no longer exists.", enfe);
             }
             List<String> illegalOrphanMessages = null;
-            List<RemittancesCaffee> remittancesCaffeeListOrphanCheck = packagingCaffee.getRemittancesCaffeeList();
-            for (RemittancesCaffee remittancesCaffeeListOrphanCheckRemittancesCaffee : remittancesCaffeeListOrphanCheck) {
+            List<AdictionalElementsHasPackagingCaffee> adictionalElementsHasPackagingCaffeeListOrphanCheck = packagingCaffee.getAdictionalElementsHasPackagingCaffeeList();
+            for (AdictionalElementsHasPackagingCaffee adictionalElementsHasPackagingCaffeeListOrphanCheckAdictionalElementsHasPackagingCaffee : adictionalElementsHasPackagingCaffeeListOrphanCheck) {
                 if (illegalOrphanMessages == null) {
                     illegalOrphanMessages = new ArrayList<String>();
                 }
-                illegalOrphanMessages.add("This PackagingCaffee (" + packagingCaffee + ") cannot be destroyed since the RemittancesCaffee " + remittancesCaffeeListOrphanCheckRemittancesCaffee + " in its remittancesCaffeeList field has a non-nullable packagingCaffeeId field.");
+                illegalOrphanMessages.add("This PackagingCaffee (" + packagingCaffee + ") cannot be destroyed since the AdictionalElementsHasPackagingCaffee " + adictionalElementsHasPackagingCaffeeListOrphanCheckAdictionalElementsHasPackagingCaffee + " in its adictionalElementsHasPackagingCaffeeList field has a non-nullable packagingCaffee field.");
             }
             if (illegalOrphanMessages != null) {
                 throw new IllegalOrphanException(illegalOrphanMessages);
-            }
-            PortOperators portOperatorsId = packagingCaffee.getPortOperatorsId();
-            if (portOperatorsId != null) {
-                portOperatorsId.getPackagingCaffeeList().remove(packagingCaffee);
-                portOperatorsId = em.merge(portOperatorsId);
             }
             TypeContainer typeContainerId = packagingCaffee.getTypeContainerId();
             if (typeContainerId != null) {
@@ -288,13 +278,18 @@ public class PackagingCaffeeJpaController implements Serializable {
             }
             NavyAgent navyAgentId = packagingCaffee.getNavyAgentId();
             if (navyAgentId != null) {
-                navyAgentId.getPackagingCaffeeoldList().remove(packagingCaffee);
+                navyAgentId.getPackagingCaffeeList().remove(packagingCaffee);
                 navyAgentId = em.merge(navyAgentId);
             }
             ShippingLines shippingLinesId = packagingCaffee.getShippingLinesId();
             if (shippingLinesId != null) {
-                shippingLinesId.getPackagingCaffeeoldList().remove(packagingCaffee);
+                shippingLinesId.getPackagingCaffeeList().remove(packagingCaffee);
                 shippingLinesId = em.merge(shippingLinesId);
+            }
+            StatePackaging statePackagingId = packagingCaffee.getStatePackagingId();
+            if (statePackagingId != null) {
+                statePackagingId.getPackagingCaffeeList().remove(packagingCaffee);
+                statePackagingId = em.merge(statePackagingId);
             }
             em.remove(packagingCaffee);
             em.getTransaction().commit();
@@ -332,22 +327,9 @@ public class PackagingCaffeeJpaController implements Serializable {
     public PackagingCaffee findPackagingCaffee(Integer id) {
         EntityManager em = getEntityManager();
         try {
-            System.out.println("Find: "+id);
             return em.find(PackagingCaffee.class, id);
         } finally {
             em.close();
-        }
-    }
-    
-    public PackagingCaffee findPackingCaffeeByDEX(String DEX) {
-        EntityManager em = getEntityManager();
-        Query query = em.createQuery("SELECT pc FROM PackagingCaffee pc  WHERE pc.exportStatement=:DEX");
-        query.setParameter("DEX", DEX);
-        try {
-            return (PackagingCaffee) query.getSingleResult();
-        }
-        catch(Exception e) {
-            return null;
         }
     }
 

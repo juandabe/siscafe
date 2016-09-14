@@ -64,7 +64,7 @@ public class CommodityCaffeeDeliverController implements ActionListener{
                 add();
             break;
             case "find":
-                find();
+                //find();
             break;
         }
     }
@@ -95,7 +95,7 @@ public class CommodityCaffeeDeliverController implements ActionListener{
 //        }
     }
     
-    private void find(){
+    /*private void find(){
         String DEX = commodityCaffeeDeliverView.jTextField1.getText();
         PackagingCaffee findPackingCaffeeByDEX = packagingCaffeeJpaController.findPackingCaffeeByDEX(DEX);
         if(findPackingCaffeeByDEX != null){
@@ -112,7 +112,7 @@ public class CommodityCaffeeDeliverController implements ActionListener{
             JOptionPane.showMessageDialog(commodityCaffeeDeliverView, "No se encontro ningun registro!", "Error información", JOptionPane.ERROR_MESSAGE);
         }
         
-    }
+    }*/
     
     private void initSelectionTableConsultPallet() {
         ListSelectionModel model=commodityCaffeeDeliverView.jTable1.getSelectionModel();

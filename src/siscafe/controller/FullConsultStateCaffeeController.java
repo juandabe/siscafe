@@ -19,9 +19,11 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.DefaultTableModel;
 import siscafe.model.Clients;
 import siscafe.model.RemittancesCaffee;
+import siscafe.model.StateOperation;
 import siscafe.model.StoresCaffee;
 import siscafe.persistence.ClientsJpaController;
 import siscafe.persistence.RemittancesCaffeeJpaController;
+import siscafe.persistence.StateOperationJpaController;
 import siscafe.persistence.StoresCaffeeJpaController;
 import siscafe.report.Reports;
 import siscafe.util.MyComboBoxModel;
@@ -39,12 +41,15 @@ public class FullConsultStateCaffeeController implements ActionListener{
         clientsJpaController = new ClientsJpaController(Persistence.createEntityManagerFactory( "SISCAFE" ));
         storesCaffeeJpaController = new StoresCaffeeJpaController(Persistence.createEntityManagerFactory( "SISCAFE" ));
         remittancesCaffeeJpaController = new RemittancesCaffeeJpaController(Persistence.createEntityManagerFactory( "SISCAFE" ));
+        stateOperationJpaController = new StateOperationJpaController(Persistence.createEntityManagerFactory( "SISCAFE" ));
         listClients = clientsJpaController.findClientsEntities();
         listStoresCaffeeStart = storesCaffeeJpaController.findStoresCaffeeEntities();
         listStoresCaffeeEnd = storesCaffeeJpaController.findStoresCaffeeEntities();
+        listStateOperation = stateOperationJpaController.findStateOperationEntities();
         myComboBoxModelExporter = new MyComboBoxModel(listClients);
         myComboBoxModelStoresCaffeeStart = new MyComboBoxModel(listStoresCaffeeStart);
         myComboBoxModelStoresCaffeeEnd = new MyComboBoxModel(listStoresCaffeeEnd);
+        myComboBoxModelStateOperation = new MyComboBoxModel(listStateOperation);
     }
     
     public void initListener() {
@@ -53,6 +58,7 @@ public class FullConsultStateCaffeeController implements ActionListener{
         fullConsultStateCaffeeView.jComboBox1.setModel(myComboBoxModelStoresCaffeeStart);
         fullConsultStateCaffeeView.jComboBox2.setModel(myComboBoxModelStoresCaffeeEnd);
         fullConsultStateCaffeeView.jComboBox3.setModel(myComboBoxModelExporter);
+        fullConsultStateCaffeeView.jComboBox4.setModel(myComboBoxModelStateOperation);
         initSelectionTableConsultGeneral();
     }
     
@@ -110,27 +116,9 @@ public class FullConsultStateCaffeeController implements ActionListener{
         Object columnNames[] = { "Remesa","Fecha Radicado","Estado Actual","Activo", "Vehiculo", "Lote","En Bodega (Sacos)", "Peso Real (Kg)", "Tara (Kg)"};
         while(iteratorRemittancesCaffee.hasNext()) {
             RemittancesCaffee remittance = (RemittancesCaffee)iteratorRemittancesCaffee.next();
-            String statusOperation="";
-            switch(remittance.getStatusOperation()) {
-                case 1:
-                    statusOperation="SOLO RADICADO";
-                break;
-                case 2:
-                    statusOperation="EN DESCARGUE";
-                break;
-                case 3:
-                    statusOperation="DESCARGADO";
-                break;
-                case 4:
-                    statusOperation="ORDENADO";
-                break;
-                case 5:
-                    statusOperation="EMBALADO";
-                break;
-            }
             rowDataRemittances[indexRow][0] = remittance.getId();
             rowDataRemittances[indexRow][1] = dt1.format(remittance.getCreatedDate());
-            rowDataRemittances[indexRow][2] = statusOperation;
+            rowDataRemittances[indexRow][2] = remittance.getStatusOperation().getName();
             rowDataRemittances[indexRow][3] = (remittance.getIsActive() == true) ? "SI" : "NO";
             rowDataRemittances[indexRow][4] = remittance.getVehiclePlate();
             rowDataRemittances[indexRow][5] = remittance.getLotCaffee();
@@ -173,16 +161,19 @@ public class FullConsultStateCaffeeController implements ActionListener{
         return clients;
     }
     
+    private StateOperationJpaController stateOperationJpaController;
     private String username;
     private Object [][] rowDataRemittances;
     private RemittancesCaffeeJpaController remittancesCaffeeJpaController;
     private FullConsultStateCaffeeView fullConsultStateCaffeeView;
     private MyComboBoxModel myComboBoxModelExporter;
+    private MyComboBoxModel myComboBoxModelStateOperation;
     private MyComboBoxModel myComboBoxModelStoresCaffeeStart;
     private MyComboBoxModel myComboBoxModelStoresCaffeeEnd;
     private ClientsJpaController clientsJpaController;
     private StoresCaffeeJpaController storesCaffeeJpaController;
     private List<Clients> listClients;
+    private List<StateOperation> listStateOperation;
     private List<StoresCaffee> listStoresCaffeeStart;
     private List<StoresCaffee> listStoresCaffeeEnd;
 }

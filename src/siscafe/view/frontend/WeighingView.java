@@ -121,7 +121,7 @@ public class WeighingView extends javax.swing.JInternalFrame {
         jButton1.setName("toWeigh"); // NOI18N
 
         jSpinner1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(0), null, Integer.valueOf(100), Integer.valueOf(1)));
+        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(0, null, 100, 1));
 
         jLabel3.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel3.setText("Cantidad de sacos:");
@@ -141,7 +141,7 @@ public class WeighingView extends javax.swing.JInternalFrame {
         jSplitPane2.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
         jTable2.setBackground(new java.awt.Color(0, 0, 0));
-        jTable2.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
+        jTable2.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         jTable2.setForeground(new java.awt.Color(0, 255, 0));
         jTable2.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -155,6 +155,7 @@ public class WeighingView extends javax.swing.JInternalFrame {
             }
         ));
         jTable2.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jTable2.setShowHorizontalLines(false);
         jScrollPane2.setViewportView(jTable2);
 
         jSplitPane2.setTopComponent(jScrollPane2);

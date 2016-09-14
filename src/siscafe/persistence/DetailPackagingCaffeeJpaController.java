@@ -16,7 +16,6 @@ import javax.persistence.criteria.Root;
 import siscafe.model.DetailPackagingCaffee;
 import siscafe.model.DetailPackagingCaffeePK;
 import siscafe.model.RemittancesCaffee;
-import siscafe.model.PackagingCaffee;
 import siscafe.persistence.exceptions.NonexistentEntityException;
 import siscafe.persistence.exceptions.PreexistingEntityException;
 
@@ -50,19 +49,10 @@ public class DetailPackagingCaffeeJpaController implements Serializable {
                 remittancesCaffee = em.getReference(remittancesCaffee.getClass(), remittancesCaffee.getId());
                 detailPackagingCaffee.setRemittancesCaffee(remittancesCaffee);
             }
-            PackagingCaffee packagingCaffee = detailPackagingCaffee.getPackagingCaffee();
-            if (packagingCaffee != null) {
-                packagingCaffee = em.getReference(packagingCaffee.getClass(), packagingCaffee.getId());
-                detailPackagingCaffee.setPackagingCaffee(packagingCaffee);
-            }
             em.persist(detailPackagingCaffee);
             if (remittancesCaffee != null) {
                 remittancesCaffee.getDetailPackagingCaffeeList().add(detailPackagingCaffee);
                 remittancesCaffee = em.merge(remittancesCaffee);
-            }
-            if (packagingCaffee != null) {
-                packagingCaffee.getDetailPackagingCaffeeList().add(detailPackagingCaffee);
-                packagingCaffee = em.merge(packagingCaffee);
             }
             em.getTransaction().commit();
         } catch (Exception ex) {
@@ -87,15 +77,9 @@ public class DetailPackagingCaffeeJpaController implements Serializable {
             DetailPackagingCaffee persistentDetailPackagingCaffee = em.find(DetailPackagingCaffee.class, detailPackagingCaffee.getDetailPackagingCaffeePK());
             RemittancesCaffee remittancesCaffeeOld = persistentDetailPackagingCaffee.getRemittancesCaffee();
             RemittancesCaffee remittancesCaffeeNew = detailPackagingCaffee.getRemittancesCaffee();
-            PackagingCaffee packagingCaffeeOld = persistentDetailPackagingCaffee.getPackagingCaffee();
-            PackagingCaffee packagingCaffeeNew = detailPackagingCaffee.getPackagingCaffee();
             if (remittancesCaffeeNew != null) {
                 remittancesCaffeeNew = em.getReference(remittancesCaffeeNew.getClass(), remittancesCaffeeNew.getId());
                 detailPackagingCaffee.setRemittancesCaffee(remittancesCaffeeNew);
-            }
-            if (packagingCaffeeNew != null) {
-                packagingCaffeeNew = em.getReference(packagingCaffeeNew.getClass(), packagingCaffeeNew.getId());
-                detailPackagingCaffee.setPackagingCaffee(packagingCaffeeNew);
             }
             detailPackagingCaffee = em.merge(detailPackagingCaffee);
             if (remittancesCaffeeOld != null && !remittancesCaffeeOld.equals(remittancesCaffeeNew)) {
@@ -105,14 +89,6 @@ public class DetailPackagingCaffeeJpaController implements Serializable {
             if (remittancesCaffeeNew != null && !remittancesCaffeeNew.equals(remittancesCaffeeOld)) {
                 remittancesCaffeeNew.getDetailPackagingCaffeeList().add(detailPackagingCaffee);
                 remittancesCaffeeNew = em.merge(remittancesCaffeeNew);
-            }
-            if (packagingCaffeeOld != null && !packagingCaffeeOld.equals(packagingCaffeeNew)) {
-                packagingCaffeeOld.getDetailPackagingCaffeeList().remove(detailPackagingCaffee);
-                packagingCaffeeOld = em.merge(packagingCaffeeOld);
-            }
-            if (packagingCaffeeNew != null && !packagingCaffeeNew.equals(packagingCaffeeOld)) {
-                packagingCaffeeNew.getDetailPackagingCaffeeList().add(detailPackagingCaffee);
-                packagingCaffeeNew = em.merge(packagingCaffeeNew);
             }
             em.getTransaction().commit();
         } catch (Exception ex) {
@@ -148,11 +124,6 @@ public class DetailPackagingCaffeeJpaController implements Serializable {
                 remittancesCaffee.getDetailPackagingCaffeeList().remove(detailPackagingCaffee);
                 remittancesCaffee = em.merge(remittancesCaffee);
             }
-            PackagingCaffee packagingCaffee = detailPackagingCaffee.getPackagingCaffee();
-            if (packagingCaffee != null) {
-                packagingCaffee.getDetailPackagingCaffeeList().remove(detailPackagingCaffee);
-                packagingCaffee = em.merge(packagingCaffee);
-            }
             em.remove(detailPackagingCaffee);
             em.getTransaction().commit();
         } finally {
@@ -183,6 +154,18 @@ public class DetailPackagingCaffeeJpaController implements Serializable {
             return q.getResultList();
         } finally {
             em.close();
+        }
+    }
+    
+    public List<DetailPackagingCaffee> findListDetailPackagingCaffeeByOIE(int oie){
+        EntityManager em = getEntityManager();
+        Query query = em.createQuery("SELECT dpc FROM DetailPackagingCaffee dpc  WHERE dpc.packagingCaffee.id=:oiefind");
+        query.setParameter("oiefind", oie);
+        try {
+            return (List<DetailPackagingCaffee>) query.getResultList();
+        }
+        catch(Exception e) {
+            return null;
         }
     }
 

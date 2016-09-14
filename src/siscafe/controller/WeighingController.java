@@ -21,6 +21,7 @@ import siscafe.model.Customs;
 import siscafe.model.MarkCaffee;
 import siscafe.model.RemittancesCaffee;
 import siscafe.model.Shippers;
+import siscafe.model.StateOperation;
 import siscafe.model.UnitsCaffee;
 import siscafe.model.Users;
 import siscafe.model.WeighingDownloadCaffee;
@@ -104,7 +105,7 @@ public class WeighingController implements ActionListener{
                 int bagsRadicated = remittancesCaffeeProcess.getQuantityBagRadicatedIn();
                 int bagsInStore = remittancesCaffeeProcess.getQuantityBagInStore();
                 if(bagsInStore == bagsRadicated) {
-                    remittancesCaffeeProcess.setStatusOperation(Integer.valueOf(new ReaderProperties().getProperties("STATUS_CAFFEE_WEIGHTCOMPLETED")));
+                    remittancesCaffeeProcess.setStatusOperation(new StateOperation(2));
                     try {
                         remittancesCaffeeJpaController.edit(remittancesCaffeeProcess);
                     } catch (Exception ex) {
@@ -124,7 +125,7 @@ public class WeighingController implements ActionListener{
                     int bagsInRemittancesCaffee = remittancesCaffeeProcess.getQuantityBagInStore();
                     int quantityBagsRemittancesCaffee = weighingPackagingCaffeeJpaController.countBagsByRemettencesCaffee(remittancesCaffeeProcess.getId());
                     if(bagsInRemittancesCaffee == quantityBagsRemittancesCaffee) {
-                        remittancesCaffeeProcess.setStatusOperation(6);
+                        remittancesCaffeeProcess.setStatusOperation(new StateOperation(4));
                         remittancesCaffeeJpaController.edit(remittancesCaffeeProcess);
                         JOptionPane.showMessageDialog(weighingView, "Se embalo completamente la remesa "+remittancesCaffeeProcess.getId(), "Confirmación", JOptionPane.INFORMATION_MESSAGE);
                     }
@@ -394,7 +395,7 @@ public class WeighingController implements ActionListener{
                         if(selectionAnswer == 0) {
                             try {
                                 RemittancesCaffee remittancesCaffeeSelected = remittancesCaffeeJpaController.findRemittancesCaffee(remettancesId);
-                                remittancesCaffeeSelected.setStatusOperation(Integer.valueOf("2"));
+                                remittancesCaffeeSelected.setStatusOperation(new StateOperation(1));
                                 remittancesCaffeeSelected.setStaffWtInId(basculeUser);
                                 remittancesCaffeeJpaController.edit(remittancesCaffeeSelected);
                                 refresh();
@@ -419,7 +420,7 @@ public class WeighingController implements ActionListener{
                         if(selectionAnswer == 0) {
                             try {
                                 RemittancesCaffee remittancesCaffeeSelected = remittancesCaffeeJpaController.findRemittancesCaffee(remettancesId);
-                                remittancesCaffeeSelected.setStatusOperation(5);
+                                remittancesCaffeeSelected.setStatusOperation(new StateOperation(5));
                                 remittancesCaffeeSelected.setStaffWtInId(basculeUser);
                                 remittancesCaffeeJpaController.edit(remittancesCaffeeSelected);
                                 refresh();

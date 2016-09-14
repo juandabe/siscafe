@@ -73,6 +73,8 @@ public class RemittancesCaffee implements Serializable {
     private String lotCaffee;
     @Column(name = "quantity_radicated_bag_in")
     private Integer quantityBagRadicatedIn;
+    @Column(name = "quantity_radicated_bag_out")
+    private Integer quantityBagRadicatedOut;
     @Column(name = "quantity_bag_in_store")
     private Integer quantityBagInStore;
     @Column(name = "quantity_bag_out_store")
@@ -121,9 +123,9 @@ public class RemittancesCaffee implements Serializable {
     @Basic(optional = false)
     @Column(name = "observation")
     private String observation;
-    @Basic(optional = false)
-    @Column(name = "status_operation")
-    private int statusOperation;
+    @JoinColumn(name = "state_operation_id", referencedColumnName = "id")
+    @ManyToOne(optional = false)
+    private StateOperation stateOperationId;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "remittancesCaffeeId")
     private List<WeighingDownloadCaffee> weighingDownloadCaffeeList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "remittancesCaffeeId")
@@ -177,12 +179,20 @@ public class RemittancesCaffee implements Serializable {
         this.id = id;
     }
 
-    public int getStatusOperation() {
-        return statusOperation;
+    public StateOperation getStatusOperation() {
+        return stateOperationId;
     }
 
-    public void setStatusOperation(int statusOperation) {
-        this.statusOperation = statusOperation;
+    public void setStatusOperation(StateOperation statusOperation) {
+        this.stateOperationId = statusOperation;
+    }
+
+    public Integer getQuantityBagRadicatedOut() {
+        return quantityBagRadicatedOut;
+    }
+
+    public void setQuantityBagRadicatedOut(Integer quantityBagRadicatedOut) {
+        this.quantityBagRadicatedOut = quantityBagRadicatedOut;
     }
 
     public RemittancesCaffee(Integer id, String lotCaffee, String autoOtm, Date createdDate, Date updatedDated, boolean isActive, String guideId) {
