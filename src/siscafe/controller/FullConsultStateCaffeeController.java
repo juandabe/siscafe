@@ -73,6 +73,8 @@ public class FullConsultStateCaffeeController implements ActionListener{
     }
     
     private void consultGeneral() {
+        String datos="";
+        boolean datosErroneos = false;
         Date dateStart = fullConsultStateCaffeeView.jXDatePicker1.getDate();
         Date dateEnd = fullConsultStateCaffeeView.jXDatePicker2.getDate();
         boolean findByStoreIndependient = fullConsultStateCaffeeView.jCheckBox1.isSelected();
@@ -81,33 +83,150 @@ public class FullConsultStateCaffeeController implements ActionListener{
             JOptionPane.showInternalMessageDialog(fullConsultStateCaffeeView, 
                     "Consulta por rango de fechas.\nFechas invalidas. Por favor seleccione un rango de fechas correctas!", "Datos invalidos", JOptionPane.ERROR_MESSAGE);
         }
-        if(findByStoreIndependient == false) {
+       if(findByStoreIndependient == false) {
+            datos="rangBodegas";
             String storeCaffeeSelectedStart = (String) fullConsultStateCaffeeView.jComboBox1.getSelectedItem();
             String storeCaffeeSelectedEnd = (String) fullConsultStateCaffeeView.jComboBox2.getSelectedItem();
             if(storeCaffeeSelectedStart == null || storeCaffeeSelectedEnd == null) {
+                datosErroneos= true;
                 JOptionPane.showInternalMessageDialog(fullConsultStateCaffeeView, 
                     "Consulta por rango de bodegas.\nBodegas no seleccionadas. Por favor seleccione un rango de bodegas correctas!", "Datos invalidos", JOptionPane.ERROR_MESSAGE);
             }
         }
         else {
+            datos="allBodegas";
             String storeCaffeeSelectedStart = (String) fullConsultStateCaffeeView.jComboBox1.getSelectedItem();
             if(storeCaffeeSelectedStart == null) {
+                datosErroneos= true;
                 JOptionPane.showInternalMessageDialog(fullConsultStateCaffeeView, 
                     "Consulta por una bodega.\nBodega no seleccionada. Por favor seleccione una bodega correcta!", "Datos invalidos", JOptionPane.ERROR_MESSAGE);
             }
         }
         if(findByAllClients == false) {
+            datos=datos + " "+"espClient";
             String exporterSelected = (String) fullConsultStateCaffeeView.jComboBox3.getSelectedItem();
             if(exporterSelected == null) {
+                datosErroneos= true;
                 JOptionPane.showInternalMessageDialog(fullConsultStateCaffeeView, 
                     "Consulta por exportador.\nExportador no seleccionado. Por favor seleccione una exportador!", "Datos invalidos", JOptionPane.ERROR_MESSAGE);
             }
+        }else{
+        datos=datos + " "+"allClient";
         }
-        refreshListRemittancesConsult();
+        String stateSelected = (String)fullConsultStateCaffeeView.jComboBox4.getSelectedItem();
+        if(stateSelected != null){
+        datos=datos + " "+"state";
+        }
+        System.out.println(datos);
+        if (datosErroneos == false){
+            switch (datos){
+            case "allBodegas allClient":
+               dateStart = fullConsultStateCaffeeView.jXDatePicker1.getDate();
+               dateEnd = fullConsultStateCaffeeView.jXDatePicker2.getDate();
+               List <RemittancesCaffee> listRemittancesCaffee = remittancesCaffeeJpaController.findRemittancesCaffeeByConsultGeneral(dateStart,dateEnd);
+               refreshListRemittancesConsult(listRemittancesCaffee);
+               //funciona Perfecto.
+            break;
+            case "allBodegas allClient state":
+               dateStart = fullConsultStateCaffeeView.jXDatePicker1.getDate();
+               dateEnd = fullConsultStateCaffeeView.jXDatePicker2.getDate();
+               stateSelected = (String)fullConsultStateCaffeeView.jComboBox4.getSelectedItem(); 
+               StateOperation state=stateOperationJpaController.findStateOperationName(stateSelected);
+               listRemittancesCaffee = remittancesCaffeeJpaController.findRemittancesCaffeeByStateandDate(state,dateStart,dateEnd);
+               refreshListRemittancesConsult(listRemittancesCaffee);
+               //funciona Perfecto.
+            break;
+            case "rangBodegas allClient state":
+                dateStart = fullConsultStateCaffeeView.jXDatePicker1.getDate();
+                dateEnd = fullConsultStateCaffeeView.jXDatePicker2.getDate();
+                String storeCaffeeSelectedStart = (String) fullConsultStateCaffeeView.jComboBox1.getSelectedItem();
+                StoresCaffee StoreStart=storesCaffeeJpaController.findStoresCaffeebyName(storeCaffeeSelectedStart);
+                String storeCaffeeSelectedEnd = (String) fullConsultStateCaffeeView.jComboBox2.getSelectedItem();
+                StoresCaffee StoreEnd=storesCaffeeJpaController.findStoresCaffeebyName(storeCaffeeSelectedEnd);
+                stateSelected = (String)fullConsultStateCaffeeView.jComboBox4.getSelectedItem(); 
+                state=stateOperationJpaController.findStateOperationName(stateSelected);
+                listRemittancesCaffee = remittancesCaffeeJpaController.findRemittancesCaffeeByStoreandState(state,StoreStart,StoreEnd,dateStart,dateEnd);
+                refreshListRemittancesConsult(listRemittancesCaffee);
+                //Listo pero no funciona por este error: The association field 'r.slotStoreId' cannot be used as a state field path.
+            break;
+            case "rangBodegas espClient state":
+                dateStart = fullConsultStateCaffeeView.jXDatePicker1.getDate();
+                dateEnd = fullConsultStateCaffeeView.jXDatePicker2.getDate();
+                String exporterSelected = (String) fullConsultStateCaffeeView.jComboBox3.getSelectedItem();
+                Clients clients=clientsJpaController.findClientesByBusinessName(exporterSelected);
+                stateSelected = (String)fullConsultStateCaffeeView.jComboBox4.getSelectedItem(); 
+                state=stateOperationJpaController.findStateOperationName(stateSelected);
+                storeCaffeeSelectedStart = (String) fullConsultStateCaffeeView.jComboBox1.getSelectedItem();
+                StoreStart=storesCaffeeJpaController.findStoresCaffeebyName(storeCaffeeSelectedStart);
+                storeCaffeeSelectedEnd = (String) fullConsultStateCaffeeView.jComboBox2.getSelectedItem();
+                StoreEnd=storesCaffeeJpaController.findStoresCaffeebyName(storeCaffeeSelectedEnd);
+                listRemittancesCaffee = remittancesCaffeeJpaController.findRemittancesCaffeeByStoreandClientandState(state,clients,StoreStart,StoreEnd,dateStart,dateEnd);
+                refreshListRemittancesConsult(listRemittancesCaffee);
+                //Listo pero no funciona por este error: The association field 'r.slotStoreId' cannot be used as a state field path.
+            break;
+            case "rangBodegas allClient":
+                dateStart = fullConsultStateCaffeeView.jXDatePicker1.getDate();
+                dateEnd = fullConsultStateCaffeeView.jXDatePicker2.getDate();
+                storeCaffeeSelectedStart = (String) fullConsultStateCaffeeView.jComboBox1.getSelectedItem();
+                StoreStart=storesCaffeeJpaController.findStoresCaffeebyName(storeCaffeeSelectedStart);
+                storeCaffeeSelectedEnd = (String) fullConsultStateCaffeeView.jComboBox2.getSelectedItem();
+                StoreEnd=storesCaffeeJpaController.findStoresCaffeebyName(storeCaffeeSelectedEnd);
+                listRemittancesCaffee = remittancesCaffeeJpaController.findRemittancesCaffeeByStore(StoreStart,StoreEnd,dateStart,dateEnd);
+                refreshListRemittancesConsult(listRemittancesCaffee);
+                //Listo pero no funciona por este error: The association field 'r.slotStoreId' cannot be used as a state field path.
+            break;
+            case "rangBodegas espClient":
+                dateStart = fullConsultStateCaffeeView.jXDatePicker1.getDate();
+                dateEnd = fullConsultStateCaffeeView.jXDatePicker2.getDate();
+                storeCaffeeSelectedStart = (String) fullConsultStateCaffeeView.jComboBox1.getSelectedItem();
+                StoreStart=storesCaffeeJpaController.findStoresCaffeebyName(storeCaffeeSelectedStart);
+                storeCaffeeSelectedEnd = (String) fullConsultStateCaffeeView.jComboBox2.getSelectedItem();
+                StoreEnd=storesCaffeeJpaController.findStoresCaffeebyName(storeCaffeeSelectedEnd);
+                exporterSelected = (String) fullConsultStateCaffeeView.jComboBox3.getSelectedItem();
+                clients=clientsJpaController.findClientesByBusinessName(exporterSelected);
+                listRemittancesCaffee = remittancesCaffeeJpaController.findRemittancesCaffeeByStoreandClient(clients,StoreStart,StoreEnd,dateStart,dateEnd);
+                refreshListRemittancesConsult(listRemittancesCaffee);                
+                //Listo pero no funciona por este error: The association field 'r.slotStoreId' cannot be used as a state field path.
+            break;
+            case "allBodegas espClient state":
+                dateStart = fullConsultStateCaffeeView.jXDatePicker1.getDate();
+                dateEnd = fullConsultStateCaffeeView.jXDatePicker2.getDate();
+                exporterSelected = (String) fullConsultStateCaffeeView.jComboBox3.getSelectedItem();
+                clients=clientsJpaController.findClientesByBusinessName(exporterSelected);
+                stateSelected = (String)fullConsultStateCaffeeView.jComboBox4.getSelectedItem(); 
+                state=stateOperationJpaController.findStateOperationName(stateSelected);
+                listRemittancesCaffee = remittancesCaffeeJpaController.findRemittancesCaffeeByClientandState(state,clients,dateStart,dateEnd);
+                refreshListRemittancesConsult(listRemittancesCaffee);
+                //funciona Perfecto.
+            break;
+            case "allBodegas espClient":
+                dateStart = fullConsultStateCaffeeView.jXDatePicker1.getDate();
+                dateEnd = fullConsultStateCaffeeView.jXDatePicker2.getDate();
+                exporterSelected = (String) fullConsultStateCaffeeView.jComboBox3.getSelectedItem();
+                clients=clientsJpaController.findClientesByBusinessName(exporterSelected);
+                listRemittancesCaffee = remittancesCaffeeJpaController.findRemittancesCaffeeByExporterandDate(clients,dateStart,dateEnd);
+                refreshListRemittancesConsult(listRemittancesCaffee);
+                //funciona Perfecto.
+            break;
+            
+            
+        }
+            
+        }
+        else{
+        JOptionPane.showInternalMessageDialog(fullConsultStateCaffeeView, 
+                    "No se puede realizar la consulta !", "Faltan algunos  datos", JOptionPane.ERROR_MESSAGE);
+            }
+       
     }
     
-    private void refreshListRemittancesConsult() {
-        List <RemittancesCaffee> listRemittancesCaffee = remittancesCaffeeJpaController.findRemittancesCaffeeByConsultGeneral();
+    private void refreshListRemittancesConsult(List <RemittancesCaffee> listRemittancesCaffee) {
+        //List <RemittancesCaffee> listRemittancesCaffee = remittancesCaffeeJpaController.findRemittancesCaffeeByConsultGeneral(dateStart,dateEnd,clientes);
+        if(listRemittancesCaffee == null) {
+        System.out.println(listRemittancesCaffee);
+        JOptionPane.showInternalMessageDialog(fullConsultStateCaffeeView, 
+                    "Su consulta no arrojo resultados!", "Resultado de Busqueda", JOptionPane.ERROR_MESSAGE);
+        }
         Iterator <RemittancesCaffee> iteratorRemittancesCaffee = listRemittancesCaffee.iterator();
         int sizeList = listRemittancesCaffee.size();
         int indexRow=0;

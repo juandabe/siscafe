@@ -39,7 +39,7 @@ public class Reports {
             map.put("END_STORE",endStore);
             map.put("username",username);
             Connection conn =null;
-            conn = DriverManager.getConnection("jdbc:mysql://192.168.35.213:3306/schema_siscafe?zeroDateTimeBehavior=convertToNull", "sop_user", "123");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/schema_siscafe?zeroDateTimeBehavior=convertToNull", "sop_user", "123");
             String path = new ReaderProperties().getProperties("DAYLYDOWNLOADCAFFEE");
             JasperReport report = null;
             report = (JasperReport) JRLoader.loadObjectFromFile(path);
@@ -60,7 +60,7 @@ public class Reports {
             HashMap map = new HashMap();
             map.put("REMITTANCE_ID",remittancesCaffeeId);
             Connection conn =null;
-            conn = DriverManager.getConnection("jdbc:mysql://192.168.35.213:3306/schema_siscafe?zeroDateTimeBehavior=convertToNull", "sop_user", "123");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/schema_siscafe?zeroDateTimeBehavior=convertToNull", "sop_user", "123");
             String path = new ReaderProperties().getProperties("REPORTDOWNLOADDIR");
             JasperReport report = null;
             report = (JasperReport) JRLoader.loadObjectFromFile(path);
@@ -82,7 +82,7 @@ public class Reports {
             map.put("REMITTANCES_ID",remittancesCaffeeId);
             map.put("username",username);
             Connection conn =null;
-            conn = DriverManager.getConnection("jdbc:mysql://192.168.35.213:3306/schema_siscafe?zeroDateTimeBehavior=convertToNull", "sop_user", "123");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/schema_siscafe?zeroDateTimeBehavior=convertToNull", "sop_user", "123");
             String path = new ReaderProperties().getProperties("REPORTREMITTANCESCAFFEERADICATED");
             JasperReport report = null;
             report = (JasperReport) JRLoader.loadObjectFromFile(path);
@@ -103,7 +103,7 @@ public class Reports {
             map.put("REMMITANCE_ID",remittancesCaffee);
             map.put("username",username);
             Connection conn =null;
-            conn = DriverManager.getConnection("jdbc:mysql://192.168.35.213:3306/schema_siscafe?zeroDateTimeBehavior=convertToNull", "sop_user", "123");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/schema_siscafe?zeroDateTimeBehavior=convertToNull", "sop_user", "123");
             String path = new ReaderProperties().getProperties("REMITTANCESCAFFE_DETAILS");
             JasperReport report = null;
             report = (JasperReport) JRLoader.loadObjectFromFile(path);
@@ -124,7 +124,7 @@ public class Reports {
             map.put("OIE",OIE);
             map.put("username",username);
             Connection conn =null;
-            conn = DriverManager.getConnection("jdbc:mysql://192.168.35.213:3306/schema_siscafe?zeroDateTimeBehavior=convertToNull", "sop_user", "123");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/schema_siscafe?zeroDateTimeBehavior=convertToNull", "sop_user", "123");
             String path = new ReaderProperties().getProperties("COMMODITYCAFFEEDLIVER");
             JasperReport report = null;
             report = (JasperReport) JRLoader.loadObjectFromFile(path);

@@ -121,6 +121,17 @@ public class StateOperationJpaController implements Serializable {
             em.close();
         }
     }
+    
+    public StateOperation findStateOperationName(String name) {
+        EntityManager em = getEntityManager();
+        Query query = em.createQuery("SELECT s FROM StateOperation s WHERE s.name = :name");
+        query.setParameter("name", name);
+        try {
+            return (StateOperation)query.getSingleResult();
+        } finally {
+            em.close();
+        }
+    }
 
     public int getStateOperationCount() {
         EntityManager em = getEntityManager();

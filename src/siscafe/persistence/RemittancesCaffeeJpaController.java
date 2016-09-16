@@ -6,6 +6,7 @@
 package siscafe.persistence;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -20,6 +21,8 @@ import siscafe.model.Clients;
 import siscafe.model.RemittancesCaffee;
 import siscafe.model.Shippers;
 import siscafe.model.SlotStore;
+import siscafe.model.StateOperation;
+import siscafe.model.StoresCaffee;
 import siscafe.persistence.exceptions.NonexistentEntityException;
 import siscafe.persistence.exceptions.PreexistingEntityException;
 
@@ -343,10 +346,119 @@ public class RemittancesCaffeeJpaController implements Serializable {
             return null;
         }
     }
-
-    public List<RemittancesCaffee> findRemittancesCaffeeByConsultGeneral() {
+    
+    public List<RemittancesCaffee> findRemittancesCaffeeByExporterandDate(Clients client,Date fechaStart,Date fechaEnd) {
         EntityManager em = getEntityManager();
-        Query query = em.createQuery("SELECT r FROM RemittancesCaffee r");
+        Query query = em.createQuery("SELECT r FROM RemittancesCaffee r WHERE r.clientId=:clientId and r.createdDate between :dateStart and :dateEnd");
+     //   "SELECT r FROM RemittancesCaffee r WHERE r.createdDate between :dateStart and :dateEnd"
+        query.setParameter("dateStart", fechaStart);
+        query.setParameter("dateEnd", fechaEnd); 
+        query.setParameter("clientId", client);
+        try {
+            return (List<RemittancesCaffee>) query.getResultList();
+        }
+        catch(Exception e) {
+            return null;
+        }
+    }
+    public List<RemittancesCaffee> findRemittancesCaffeeByStateandDate(StateOperation state,Date fechaStart,Date fechaEnd) {
+        EntityManager em = getEntityManager();
+        Query query = em.createQuery("SELECT r FROM RemittancesCaffee r WHERE r.stateOperationId=:statusOperation and r.createdDate between :dateStart and :dateEnd");
+     //   "SELECT r FROM RemittancesCaffee r WHERE r.createdDate between :dateStart and :dateEnd"
+        query.setParameter("dateStart", fechaStart);
+        query.setParameter("dateEnd", fechaEnd); 
+        query.setParameter("statusOperation", state);
+        try {
+            return (List<RemittancesCaffee>) query.getResultList();
+        }
+        catch(Exception e) {
+            return null;
+        }
+    }
+    
+
+   public List<RemittancesCaffee> findRemittancesCaffeeByConsultGeneral(Date fechaStart,Date fechaEnd) {
+        EntityManager em = getEntityManager();
+        Query query = em.createQuery("SELECT r FROM RemittancesCaffee r WHERE r.createdDate between :dateStart and :dateEnd");
+        query.setParameter("dateStart", fechaStart);
+        query.setParameter("dateEnd", fechaEnd); 
+        try {
+            return (List<RemittancesCaffee>) query.getResultList();
+        }
+        catch(Exception e) {
+            return null;
+        }
+    }
+   
+   public List<RemittancesCaffee> findRemittancesCaffeeByStore(StoresCaffee StoreStart,StoresCaffee StoreEnd,Date fechaStart,Date fechaEnd) {
+        EntityManager em = getEntityManager();
+        Query query = em.createQuery("SELECT r FROM RemittancesCaffee r WHERE r.slotStoreId between :storeStart and :storeEnd and r.createdDate between :dateStart and :dateEnd");
+        query.setParameter("dateStart", fechaStart);
+        query.setParameter("dateEnd", fechaEnd); 
+        query.setParameter("storeStart", StoreStart);
+        query.setParameter("storeEnd", StoreEnd); 
+        try {
+            return (List<RemittancesCaffee>) query.getResultList();
+        }
+        catch(Exception e) {
+            return null;
+        }
+    }
+   public List<RemittancesCaffee> findRemittancesCaffeeByClientandState(StateOperation state,Clients client,Date fechaStart,Date fechaEnd) {
+        EntityManager em = getEntityManager();
+        Query query = em.createQuery("SELECT r FROM RemittancesCaffee r WHERE r.stateOperationId=:statusOperation and r.clientId=:clientId and r.createdDate between :dateStart and :dateEnd");
+        query.setParameter("dateStart", fechaStart);
+        query.setParameter("dateEnd", fechaEnd); 
+        query.setParameter("statusOperation", state); 
+        query.setParameter("clientId", client); 
+        try {
+            return (List<RemittancesCaffee>) query.getResultList();
+        }
+        catch(Exception e) {
+            return null;
+        }
+    }
+   
+   public List<RemittancesCaffee> findRemittancesCaffeeByStoreandState(StateOperation state,StoresCaffee StoreStart,StoresCaffee StoreEnd,Date fechaStart,Date fechaEnd) {
+        EntityManager em = getEntityManager();
+        Query query = em.createQuery("SELECT r FROM RemittancesCaffee r WHERE r.stateOperationId=:statusOperation and r.slotStoreId between :storeStart and :storeEnd and r.createdDate between :dateStart and :dateEnd");
+        query.setParameter("dateStart", fechaStart);
+        query.setParameter("dateEnd", fechaEnd); 
+        query.setParameter("storeStart", StoreStart);
+        query.setParameter("storeEnd", StoreEnd); 
+        query.setParameter("statusOperation", state); 
+        try {
+            return (List<RemittancesCaffee>) query.getResultList();
+        }
+        catch(Exception e) {
+            return null;
+        }
+    }
+    public List<RemittancesCaffee> findRemittancesCaffeeByStoreandClient(Clients client,StoresCaffee StoreStart,StoresCaffee StoreEnd,Date fechaStart,Date fechaEnd) {
+        EntityManager em = getEntityManager();
+        Query query = em.createQuery("SELECT r FROM RemittancesCaffee r WHERE r.clientId=:clientId and r.slotStoreId between :storeStart and :storeEnd and r.createdDate between :dateStart and :dateEnd");
+        query.setParameter("dateStart", fechaStart);
+        query.setParameter("dateEnd", fechaEnd); 
+        query.setParameter("storeStart", StoreStart);
+        query.setParameter("storeEnd", StoreEnd);
+        query.setParameter("clientId", client);        
+        try {
+            return (List<RemittancesCaffee>) query.getResultList();
+        }
+        catch(Exception e) {
+            return null;
+        }
+    }
+   
+   public List<RemittancesCaffee> findRemittancesCaffeeByStoreandClientandState(StateOperation state,Clients client,StoresCaffee StoreStart,StoresCaffee StoreEnd,Date fechaStart,Date fechaEnd) {
+        EntityManager em = getEntityManager();
+        Query query = em.createQuery("SELECT r FROM RemittancesCaffee r WHERE r.clientId=:clientId and r.stateOperationId=:statusOperation and r.slotStoreId between :storeStart and :storeEnd and r.createdDate between :dateStart and :dateEnd");
+        query.setParameter("dateStart", fechaStart);
+        query.setParameter("dateEnd", fechaEnd); 
+        query.setParameter("storeStart", StoreStart);
+        query.setParameter("storeEnd", StoreEnd);
+        query.setParameter("clientId", client);
+        query.setParameter("statusOperation", state); 
         try {
             return (List<RemittancesCaffee>) query.getResultList();
         }

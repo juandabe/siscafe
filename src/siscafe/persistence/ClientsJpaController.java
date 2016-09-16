@@ -121,6 +121,16 @@ public class ClientsJpaController implements Serializable {
             em.close();
         }
     }
+     public Clients findClientesByBusinessName(String businessName) {
+        EntityManager em = getEntityManager();
+        Query query = em.createQuery("SELECT c FROM Clients c WHERE c.businessName = :businessName");
+        query.setParameter("businessName", businessName);
+        try {
+            return (Clients)query.getSingleResult();
+        } finally {
+            em.close();
+        }
+    }
 
     public int getClientsCount() {
         EntityManager em = getEntityManager();

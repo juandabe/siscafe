@@ -192,6 +192,17 @@ public class StoresCaffeeJpaController implements Serializable {
             em.close();
         }
     }
+    
+     public StoresCaffee findStoresCaffeebyName(String storeName) {
+        EntityManager em = getEntityManager();
+        Query query = em.createQuery("SELECT s FROM StoresCaffee s WHERE s.storeName = :storeName");
+        query.setParameter("storeName", storeName);
+        try {
+            return (StoresCaffee)query.getSingleResult();
+        } finally {
+            em.close();
+        }
+    }
 
     public int getStoresCaffeeCount() {
         EntityManager em = getEntityManager();
