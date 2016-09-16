@@ -127,8 +127,8 @@ public class ClientsJpaController implements Serializable {
         query.setParameter("businessName", businessName);
         try {
             return (Clients)query.getSingleResult();
-        } finally {
-            em.close();
+        } catch(Exception e) {
+            return null;
         }
     }
 

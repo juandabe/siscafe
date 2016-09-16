@@ -261,6 +261,7 @@ public class FullConsultStateCaffeeView extends javax.swing.JInternalFrame {
 
         jButton1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jButton1.setText("Consultar");
+        jButton1.setName("consultoperation"); // NOI18N
 
         jLabel10.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel10.setText("# Lote:");
@@ -394,7 +395,7 @@ public class FullConsultStateCaffeeView extends javax.swing.JInternalFrame {
     public javax.swing.JTextField jTextField2;
     public javax.swing.JTextField jTextField3;
     public javax.swing.JTextField jTextField4;
-    private javax.swing.JTextField jTextField5;
+    public javax.swing.JTextField jTextField5;
     public org.jdesktop.swingx.JXDatePicker jXDatePicker1;
     public org.jdesktop.swingx.JXDatePicker jXDatePicker2;
     // End of variables declaration//GEN-END:variables

@@ -5,12 +5,15 @@
  */
 package siscafe.controller;
 
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.persistence.Persistence;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
@@ -56,8 +59,8 @@ public class FullConsultStateCaffeeController implements ActionListener{
         fullConsultStateCaffeeView.consultar.addActionListener(this);
         fullConsultStateCaffeeView.jButton1.addActionListener(this);
         fullConsultStateCaffeeView.jComboBox1.setModel(myComboBoxModelStoresCaffeeStart);
-        fullConsultStateCaffeeView.jComboBox2.setModel(myComboBoxModelStoresCaffeeEnd);
-        fullConsultStateCaffeeView.jComboBox3.setModel(myComboBoxModelExporter);
+        fullConsultStateCaffeeView.jComboBox2.setModel(myComboBoxModelStoresCaffeeEnd);        
+        fullConsultStateCaffeeView.jComboBox3.setModel(myComboBoxModelExporter);        
         fullConsultStateCaffeeView.jComboBox4.setModel(myComboBoxModelStateOperation);
         initSelectionTableConsultGeneral();
     }
@@ -69,10 +72,60 @@ public class FullConsultStateCaffeeController implements ActionListener{
             case "consultgeneral":
                 consultGeneral();
             break;
+            case "consultoperation":            
+                consultOperation();     
+            break;
         }
     }
-    
-    private void consultGeneral() {
+    private void consultOperation() {
+        String IdRemittancesCaffee = fullConsultStateCaffeeView.jTextField1.getText(); 
+        String lot= fullConsultStateCaffeeView.jTextField4.getText();
+        String exporter = fullConsultStateCaffeeView.jTextField5.getText();  
+        if (IdRemittancesCaffee.isEmpty() && lot.isEmpty() && exporter.isEmpty()) {
+        JOptionPane.showInternalMessageDialog(fullConsultStateCaffeeView, 
+                   "Su consulta no arrojo resultados. \n Datos Incorrectos. Por favor proporcione al menos un dato !", "Resultado de Busqueda", JOptionPane.ERROR_MESSAGE);
+                    fullConsultStateCaffeeView.jTable1.repaint();
+        }
+        else{
+                 
+        if(!lot.isEmpty()){
+            lot= fullConsultStateCaffeeView.jTextField4.getText(); 
+            List <RemittancesCaffee> listRemittancesCaffee=remittancesCaffeeJpaController.findRemittancesCaffeeByLot(lot); 
+                refreshListRemittancesConsult(listRemittancesCaffee);                 
+        }                       
+        if(!exporter.isEmpty()){
+            exporter = fullConsultStateCaffeeView.jTextField5.getText(); 
+            Clients clients=clientsJpaController.findClientesByBusinessName(exporter);
+            if(clients != null){
+                List <RemittancesCaffee> listRemittancesCaffee=remittancesCaffeeJpaController.findRemittancesCaffeeByExporter(clients); 
+                
+                    refreshListRemittancesConsult(listRemittancesCaffee);
+                
+            } else{
+                JOptionPane.showInternalMessageDialog(fullConsultStateCaffeeView, 
+                   "Su consulta no arrojo resultados. \n Datos Incorrectos. Por favor proporcione un dato correcto !", "Resultado de Busqueda", JOptionPane.ERROR_MESSAGE);
+                    fullConsultStateCaffeeView.jTable1.repaint();
+                }                   
+        }                
+        if(!IdRemittancesCaffee.isEmpty()){ 
+            IdRemittancesCaffee = fullConsultStateCaffeeView.jTextField1.getText();
+            RemittancesCaffee findRemittancesCaffee = remittancesCaffeeJpaController.findRemittancesCaffee(Integer.parseInt(IdRemittancesCaffee));
+            if(findRemittancesCaffee != null){
+                fullConsultStateCaffeeView.jTextField5.setText(String.valueOf(findRemittancesCaffee.getClientId()));
+                fullConsultStateCaffeeView.jTextField4.setText(String.valueOf(findRemittancesCaffee.getLotCaffee())); 
+                List <RemittancesCaffee> listRemittancesCaffee = remittancesCaffeeJpaController.findRemittancesCaffeeBypackagingCaffeeId(Integer.parseInt(IdRemittancesCaffee));
+               
+                    refreshListRemittancesConsult(listRemittancesCaffee);
+                
+            }  else{
+                JOptionPane.showInternalMessageDialog(fullConsultStateCaffeeView, 
+                   "Su consulta no arrojo resultados. \n Datos Incorrectos. Por favor proporcione un dato correcto !", "Resultado de Busqueda", JOptionPane.ERROR_MESSAGE);
+                    fullConsultStateCaffeeView.jTable1.repaint();
+                }      
+        }  
+        }      
+    }   
+    private void consultGeneral(){
         String datos="";
         boolean datosErroneos = false;
         Date dateStart = fullConsultStateCaffeeView.jXDatePicker1.getDate();
@@ -111,7 +164,7 @@ public class FullConsultStateCaffeeController implements ActionListener{
                     "Consulta por exportador.\nExportador no seleccionado. Por favor seleccione una exportador!", "Datos invalidos", JOptionPane.ERROR_MESSAGE);
             }
         }else{
-        datos=datos + " "+"allClient";
+        datos=datos + " "+"allClient";        
         }
         String stateSelected = (String)fullConsultStateCaffeeView.jComboBox4.getSelectedItem();
         if(stateSelected != null){
@@ -220,13 +273,15 @@ public class FullConsultStateCaffeeController implements ActionListener{
        
     }
     
-    private void refreshListRemittancesConsult(List <RemittancesCaffee> listRemittancesCaffee) {
+    private void refreshListRemittancesConsult(List <RemittancesCaffee> listRemittancesCaffee){
         //List <RemittancesCaffee> listRemittancesCaffee = remittancesCaffeeJpaController.findRemittancesCaffeeByConsultGeneral(dateStart,dateEnd,clientes);
-        if(listRemittancesCaffee == null) {
-        System.out.println(listRemittancesCaffee);
-        JOptionPane.showInternalMessageDialog(fullConsultStateCaffeeView, 
-                    "Su consulta no arrojo resultados!", "Resultado de Busqueda", JOptionPane.ERROR_MESSAGE);
-        }
+     //   if(listRemittancesCaffee.isEmpty()) {
+    //    System.out.println(listRemittancesCaffee);
+    //    JOptionPane.showInternalMessageDialog(fullConsultStateCaffeeView, 
+     //               "Su consulta no arrojo resultados!", "Resultado de Busqueda", JOptionPane.ERROR_MESSAGE);
+    //                 fullConsultStateCaffeeView.jTable1.removeAll();
+        //}
+        //else{
         Iterator <RemittancesCaffee> iteratorRemittancesCaffee = listRemittancesCaffee.iterator();
         int sizeList = listRemittancesCaffee.size();
         int indexRow=0;
@@ -248,7 +303,12 @@ public class FullConsultStateCaffeeController implements ActionListener{
         }
         DefaultTableModel defaultTableModel = new DefaultTableModel(rowDataRemittances,columnNames);
         fullConsultStateCaffeeView.jTable1.setModel(defaultTableModel);
-        fullConsultStateCaffeeView.jTable1.repaint();
+        fullConsultStateCaffeeView.jTable1.repaint(); 
+        if(defaultTableModel.getRowCount()==0){
+        JOptionPane.showInternalMessageDialog(fullConsultStateCaffeeView, 
+                   "Su consulta no arrojo resultados!", "Resultado de Busqueda", JOptionPane.ERROR_MESSAGE);
+        }
+        //}
     }
     
     private void initSelectionTableConsultGeneral() {
@@ -279,6 +339,8 @@ public class FullConsultStateCaffeeController implements ActionListener{
         }
         return clients;
     }
+   
+   
     
     private StateOperationJpaController stateOperationJpaController;
     private String username;
@@ -295,4 +357,5 @@ public class FullConsultStateCaffeeController implements ActionListener{
     private List<StateOperation> listStateOperation;
     private List<StoresCaffee> listStoresCaffeeStart;
     private List<StoresCaffee> listStoresCaffeeEnd;
+
 }

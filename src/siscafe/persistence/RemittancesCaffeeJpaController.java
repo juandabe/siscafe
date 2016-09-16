@@ -277,7 +277,17 @@ public class RemittancesCaffeeJpaController implements Serializable {
             em.close();
         }
     }
-    
+    public List<RemittancesCaffee> findRemittancesCaffeeByLot(String lotCaffee) {
+        EntityManager em = getEntityManager();
+        Query query = em.createQuery("SELECT r FROM RemittancesCaffee r  WHERE r.lotCaffee=:loteCaffee");
+        query.setParameter("loteCaffee", lotCaffee);
+        try {
+            return (List<RemittancesCaffee>) query.getResultList();
+        }
+        catch(Exception e) {
+            return null;
+        }
+    }
     public RemittancesCaffee findRemittancesCaffeeByGuidedAndLot(String guide, String lotCaffee) {
         EntityManager em = getEntityManager();
         Query query = em.createQuery("SELECT r FROM RemittancesCaffee r  WHERE r.guideId=:guide and r.lotCaffee=:loteCaffee and r.isActive=true");
@@ -290,7 +300,17 @@ public class RemittancesCaffeeJpaController implements Serializable {
             return null;
         }
     }
-    
+    public List<RemittancesCaffee> findRemittancesCaffeeBypackagingCaffeeId(Integer id) {
+        EntityManager em = getEntityManager();
+        Query query = em.createQuery("SELECT r FROM RemittancesCaffee r  WHERE r.id = :id");
+        query.setParameter("id", id);        
+        try {
+            return (List<RemittancesCaffee>) query.getResultList();
+        }
+        catch(Exception e) {
+            return null;
+        }
+    }
     public List<RemittancesCaffee> findRemittancesCaffeePendientWeight() {
         EntityManager em = getEntityManager();
         Query query = em.createQuery("SELECT r FROM RemittancesCaffee r  WHERE r.statusOperation=1 and r.isActive=true");
@@ -337,7 +357,7 @@ public class RemittancesCaffeeJpaController implements Serializable {
     
     public List<RemittancesCaffee> findRemittancesCaffeeByExporter(Clients client) {
         EntityManager em = getEntityManager();
-        Query query = em.createQuery("SELECT r FROM RemittancesCaffee r  WHERE r.clientId=:clientId and r.statusOperation=3 and r.isActive=true");
+        Query query = em.createQuery("SELECT r FROM RemittancesCaffee r  WHERE r.clientId=:clientId");
         query.setParameter("clientId", client);
         try {
             return (List<RemittancesCaffee>) query.getResultList();

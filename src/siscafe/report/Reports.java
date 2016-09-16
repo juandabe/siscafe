@@ -105,6 +105,7 @@ public class Reports {
             Connection conn =null;
             conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/schema_siscafe?zeroDateTimeBehavior=convertToNull", "sop_user", "123");
             String path = new ReaderProperties().getProperties("REMITTANCESCAFFE_DETAILS");
+            System.out.println(path);
             JasperReport report = null;
             report = (JasperReport) JRLoader.loadObjectFromFile(path);
             JasperPrint print = JasperFillManager.fillReport(report, map, conn);

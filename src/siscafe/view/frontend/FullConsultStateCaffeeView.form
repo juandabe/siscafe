@@ -601,6 +601,7 @@
               <Font name="Tahoma" size="14" style="1"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Consultar"/>
+            <Property name="name" type="java.lang.String" value="consultoperation" noResource="true"/>
           </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
@@ -650,6 +651,9 @@
               <Color blue="0" green="ff" red="33" type="rgb"/>
             </Property>
           </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
+          </AuxValues>
         </Component>
       </SubComponents>
     </Container>

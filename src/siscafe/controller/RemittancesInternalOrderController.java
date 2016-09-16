@@ -649,6 +649,7 @@ public class RemittancesInternalOrderController implements ActionListener, ItemL
     public void keyPressed(KeyEvent e) {
         if(e.getKeyCode() == 10){
             String OIEFind = remittancesInternalOrderView.jTextField5.getText();
+            System.out.println(OIEFind);
             if(OIEFind != null){
                 find(OIEFind);
             }
