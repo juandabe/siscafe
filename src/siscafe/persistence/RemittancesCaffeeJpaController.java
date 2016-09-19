@@ -441,7 +441,7 @@ public class RemittancesCaffeeJpaController implements Serializable {
    
    public List<RemittancesCaffee> findRemittancesCaffeeByStoreandState(StateOperation state,StoresCaffee StoreStart,StoresCaffee StoreEnd,Date fechaStart,Date fechaEnd) {
         EntityManager em = getEntityManager();
-        Query query = em.createQuery("SELECT r FROM RemittancesCaffee r WHERE r.stateOperationId=:statusOperation and r.slotStoreId between :storeStart and :storeEnd and r.createdDate between :dateStart and :dateEnd");
+        Query query = em.createQuery("SELECT r FROM RemittancesCaffee r WHERE r.stateOperationId=:statusOperation and r.slotStoreId.storesCaffeeId.id between :storeStart and :storeEnd and r.createdDate between :dateStart and :dateEnd");
         query.setParameter("dateStart", fechaStart);
         query.setParameter("dateEnd", fechaEnd); 
         query.setParameter("storeStart", StoreStart);
@@ -456,7 +456,7 @@ public class RemittancesCaffeeJpaController implements Serializable {
     }
     public List<RemittancesCaffee> findRemittancesCaffeeByStoreandClient(Clients client,StoresCaffee StoreStart,StoresCaffee StoreEnd,Date fechaStart,Date fechaEnd) {
         EntityManager em = getEntityManager();
-        Query query = em.createQuery("SELECT r FROM RemittancesCaffee r WHERE r.clientId=:clientId and r.slotStoreId between :storeStart and :storeEnd and r.createdDate between :dateStart and :dateEnd");
+        Query query = em.createQuery("SELECT r FROM RemittancesCaffee r WHERE r.clientId=:clientId and r.slotStoreId.storesCaffeeId.id between :storeStart and :storeEnd and r.createdDate between :dateStart and :dateEnd");
         query.setParameter("dateStart", fechaStart);
         query.setParameter("dateEnd", fechaEnd); 
         query.setParameter("storeStart", StoreStart);
@@ -472,7 +472,7 @@ public class RemittancesCaffeeJpaController implements Serializable {
    
    public List<RemittancesCaffee> findRemittancesCaffeeByStoreandClientandState(StateOperation state,Clients client,StoresCaffee StoreStart,StoresCaffee StoreEnd,Date fechaStart,Date fechaEnd) {
         EntityManager em = getEntityManager();
-        Query query = em.createQuery("SELECT r FROM RemittancesCaffee r WHERE r.clientId=:clientId and r.stateOperationId=:statusOperation and r.slotStoreId between :storeStart and :storeEnd and r.createdDate between :dateStart and :dateEnd");
+        Query query = em.createQuery("SELECT r FROM RemittancesCaffee r WHERE r.clientId=:clientId and r.stateOperationId=:statusOperation and r.slotStoreId.storesCaffeeId.id between :storeStart and :storeEnd and r.createdDate between :dateStart and :dateEnd");
         query.setParameter("dateStart", fechaStart);
         query.setParameter("dateEnd", fechaEnd); 
         query.setParameter("storeStart", StoreStart);

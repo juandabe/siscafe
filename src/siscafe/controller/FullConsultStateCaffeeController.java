@@ -126,7 +126,8 @@ public class FullConsultStateCaffeeController implements ActionListener{
             case "exportstatement ":
                 ExportStatement=fullConsultStateCaffeeView.jTextField2.getText();
                 listDetailPackagingCaffee = detailPackagingCaffeeJpaController.findListDetailPackagingCaffeeByExportStatement(ExportStatement);
-                if(listDetailPackagingCaffee != null){
+                System.out.println(listDetailPackagingCaffee);
+                if(!listDetailPackagingCaffee.isEmpty()){
                 fullConsultStateCaffeeView.jTextField5.setText(listDetailPackagingCaffee.get(0).getPackagingCaffee().getBookingExpo());
                 fullConsultStateCaffeeView.jTextField6.setText(listDetailPackagingCaffee.get(0).getPackagingCaffee().getId().toString());
                 showListDetailPackagingCaffee(listDetailPackagingCaffee);
@@ -141,7 +142,7 @@ public class FullConsultStateCaffeeController implements ActionListener{
             case "booking ":
                 Booking=fullConsultStateCaffeeView.jTextField5.getText();
                listDetailPackagingCaffee = detailPackagingCaffeeJpaController.findListDetailPackagingCaffeeByBooking(Booking);
-              if(listDetailPackagingCaffee != null){
+              if(!listDetailPackagingCaffee.isEmpty()){
                 fullConsultStateCaffeeView.jTextField2.setText(listDetailPackagingCaffee.get(0).getPackagingCaffee().getExportStatement());
                 fullConsultStateCaffeeView.jTextField6.setText(listDetailPackagingCaffee.get(0).getPackagingCaffee().getId().toString());
                 showListDetailPackagingCaffee(listDetailPackagingCaffee);
