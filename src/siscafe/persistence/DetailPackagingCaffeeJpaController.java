@@ -168,6 +168,29 @@ public class DetailPackagingCaffeeJpaController implements Serializable {
             return null;
         }
     }
+    public List<DetailPackagingCaffee> findListDetailPackagingCaffeeByExportStatement(String exportStatement){
+        EntityManager em = getEntityManager();
+        Query query = em.createQuery("SELECT dpc FROM DetailPackagingCaffee dpc  WHERE dpc.packagingCaffee.exportStatement=:exportstatement");
+        query.setParameter("exportstatement", exportStatement);
+        try {
+            return (List<DetailPackagingCaffee>) query.getResultList();
+        }
+        catch(Exception e) {
+            return null;
+        }
+    }
+    
+    public List<DetailPackagingCaffee> findListDetailPackagingCaffeeByBooking(String booking){
+        EntityManager em = getEntityManager();
+        Query query = em.createQuery("SELECT dpc FROM DetailPackagingCaffee dpc  WHERE dpc.packagingCaffee.bookingExpo=:booking");
+        query.setParameter("booking", booking);
+        try {
+            return (List<DetailPackagingCaffee>) query.getResultList();
+        }
+        catch(Exception e) {
+            return null;
+        }
+    }
 
     public DetailPackagingCaffee findDetailPackagingCaffee(DetailPackagingCaffeePK id) {
         EntityManager em = getEntityManager();

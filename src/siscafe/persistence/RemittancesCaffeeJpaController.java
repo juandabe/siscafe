@@ -412,11 +412,11 @@ public class RemittancesCaffeeJpaController implements Serializable {
    
    public List<RemittancesCaffee> findRemittancesCaffeeByStore(StoresCaffee StoreStart,StoresCaffee StoreEnd,Date fechaStart,Date fechaEnd) {
         EntityManager em = getEntityManager();
-        Query query = em.createQuery("SELECT r FROM RemittancesCaffee r WHERE r.slotStoreId between :storeStart and :storeEnd and r.createdDate between :dateStart and :dateEnd");
+        Query query = em.createQuery("SELECT r FROM RemittancesCaffee r WHERE r.slotStoreId.storesCaffeeId.id between :storeStart and :storeEnd and r.createdDate between :dateStart and :dateEnd");
         query.setParameter("dateStart", fechaStart);
         query.setParameter("dateEnd", fechaEnd); 
-        query.setParameter("storeStart", StoreStart);
-        query.setParameter("storeEnd", StoreEnd); 
+        query.setParameter("storeStart", StoreStart.getId());
+        query.setParameter("storeEnd", StoreEnd.getId()); 
         try {
             return (List<RemittancesCaffee>) query.getResultList();
         }
