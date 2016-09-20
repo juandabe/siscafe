@@ -179,6 +179,17 @@ public class DetailPackagingCaffeeJpaController implements Serializable {
             return null;
         }
     }
+    public List<DetailPackagingCaffee> findListDetailPackagingCaffeeByContainer(String bicContainer){
+        EntityManager em = getEntityManager();
+        Query query = em.createQuery("SELECT dpc FROM DetailPackagingCaffee dpc  WHERE dpc.packagingCaffee.bicContainer=:bicContainer");
+        query.setParameter("bicContainer", bicContainer);
+        try {
+            return (List<DetailPackagingCaffee>) query.getResultList();
+        }
+        catch(Exception e) {
+            return null;
+        }
+    }
     
     public List<DetailPackagingCaffee> findListDetailPackagingCaffeeByBooking(String booking){
         EntityManager em = getEntityManager();

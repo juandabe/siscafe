@@ -82,6 +82,9 @@ public class PackagingCaffee implements Serializable {
     @Column(name = "packaging_type")
     private String packagingType;
     @Basic(optional = false)
+    @Column(name = "bic_container")
+    private String bicContainer;
+    @Basic(optional = false)
     @Column(name = "export_statement")
     private String exportStatement;
     @JoinColumn(name = "type_container_id", referencedColumnName = "id")
@@ -114,10 +117,16 @@ public class PackagingCaffee implements Serializable {
 
     public String getPackagingMode() {
         return packagingMode;
-    }
-
+    }  
+        
     public void setPackagingMode(String packagingMode) {
         this.packagingMode = packagingMode;
+    }
+    public String getBicContainer() {
+        return bicContainer;
+    }
+    public void setBigContainer(String bicContainer) {
+        this.bicContainer = bicContainer;
     }
 
     public Integer getId() {
